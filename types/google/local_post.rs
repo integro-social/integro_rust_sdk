@@ -20,7 +20,7 @@ pub struct LocalPost {
   pub call_to_action: Option<CallToAction>,
   pub event: Option<LocalPostEvent>,
   pub offer: Option<LocalPostOffer>,
-  #[cfg_attr(feature = "tapir", tapir(optional))]
+  #[cfg_attr(feature = "tapir", tapir(optional = nullable))]
   pub media: Vec<PostMedia>,
   pub state: Option<String>,
   pub search_url: Option<String>,

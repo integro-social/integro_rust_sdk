@@ -10,6 +10,6 @@ use crate::types::google::menu::Menu;
 pub struct FoodMenus {
   /// Resource name, `accounts/{a}/locations/{l}/foodMenus`.
   pub name: Option<String>,
-  #[cfg_attr(feature = "tapir", tapir(optional))]
+  #[cfg_attr(feature = "tapir", tapir(optional = nullable))]
   pub menus: Vec<Menu>,
 }

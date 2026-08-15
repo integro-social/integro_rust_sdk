@@ -10,9 +10,9 @@ use crate::types::google::weekday_call_metrics::WeekdayCallMetrics;
 pub struct AggregateCallMetrics {
   pub missed_calls_count: u32,
   pub answered_calls_count: u32,
-  #[cfg_attr(feature = "tapir", tapir(optional))]
+  #[cfg_attr(feature = "tapir", tapir(optional = nullable))]
   pub hourly_metrics: Vec<HourlyCallMetrics>,
-  #[cfg_attr(feature = "tapir", tapir(optional))]
+  #[cfg_attr(feature = "tapir", tapir(optional = nullable))]
   pub weekday_metrics: Vec<WeekdayCallMetrics>,
   pub start_date: Option<Date>,
   pub end_date: Option<Date>,

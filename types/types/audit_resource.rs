@@ -26,5 +26,7 @@ pub enum AuditResource {
   Conversation,
   GoogleAccount,
   UserGroup,
+  Call,
+  GhlLocation,
   Unknown,
 }

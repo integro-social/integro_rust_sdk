@@ -6,7 +6,7 @@ use crate::types::meta::whatsapp_template_header::WhatsappTemplateHeader;
 /// One block of a template *definition* — the shape Meta stores for an
 /// approved template and the shape a create request submits.
 ///
-/// The hub's own vocabulary, snake_case like every other enum on the surface;
+/// This crate's own vocabulary, snake_case like every other enum on the surface;
 /// Meta spells these uppercase, and that spelling lives at the boundary rather
 /// than on the contract.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -33,9 +33,9 @@ pub enum WhatsappTemplateComponent {
   Buttons {
     buttons: Vec<WhatsappTemplateButton>,
   },
-  /// A block kind the hub does not model — carousels, limited-time offers,
-  /// authentication add-ons. Read-only: Meta returns it and the hub surfaces
-  /// it so the template still lists, but a create request carrying one drops
+  /// A block kind this crate does not model — carousels, limited-time offers,
+  /// authentication add-ons. Read-only: Meta returns it and it is surfaced
+  /// so the template still lists, but a create request carrying one drops
   /// the block (Meta then rejects a template that lost a required part).
   Unsupported,
 }

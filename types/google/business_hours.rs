@@ -6,6 +6,6 @@ use crate::types::google::time_period::TimePeriod;
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.google"))]
 #[serde(rename_all = "camelCase")]
 pub struct BusinessHours {
-  #[cfg_attr(feature = "tapir", tapir(optional))]
+  #[cfg_attr(feature = "tapir", tapir(optional = nullable))]
   pub periods: Vec<TimePeriod>,
 }

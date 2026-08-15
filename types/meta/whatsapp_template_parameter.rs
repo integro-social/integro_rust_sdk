@@ -5,7 +5,7 @@ use crate::types::meta::whatsapp_template_date_time::WhatsappTemplateDateTime;
 use crate::types::meta::whatsapp_template_media::WhatsappTemplateMedia;
 
 /// One placeholder value. Media parameters carry a public URL, matching the
-/// rest of the send surface (the hub never sends media ids).
+/// rest of the send surface (this crate never sends media ids).
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.meta"))]
 #[serde(tag = "type")]

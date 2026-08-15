@@ -13,4 +13,8 @@ pub enum WhatsappTemplateCategory {
   Marketing,
   /// One-time passcodes.
   Authentication,
+  /// A category Meta introduced after this build. Surfaced rather than
+  /// folded into a priced tier the template does not belong to; not
+  /// submittable.
+  Unknown,
 }

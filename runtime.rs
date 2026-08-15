@@ -74,8 +74,12 @@ pub struct ClientBuilder {
 
 impl Client {
   /// Start building a client pointed at `host` (e.g. `"https://api.example.com"`).
+  ///
+  /// A trailing slash is trimmed here, once, so both transports inherit it:
+  /// generated paths always start with `/`, and the `https://host//user/1` a
+  /// config value ending in `/` would otherwise produce is a 404 on many routers.
   pub fn builder(host: impl Into<String>) -> ClientBuilder {
-    ClientBuilder { host: host.into(), headers: reqwest::header::HeaderMap::new(), timeout: None }
+    ClientBuilder { host: host.into().trim_end_matches('/').to_owned(), headers: reqwest::header::HeaderMap::new(), timeout: None }
   }
 
   /// Replace the default headers sent with every request.
@@ -266,15 +270,19 @@ impl Client {
       return Err(ApiError::rejected(status, body));
     }
 
+    // Accumulated as *bytes*: a chunk boundary falls wherever the transport puts
+    // it, and decoding each chunk on its own would replace any multi-byte
+    // character that straddles two of them with U+FFFD — inside a JSON string,
+    // where it still parses and reaches the caller as quietly mangled text. An
+    // event boundary is ASCII, so a drained event is always whole UTF-8.
     let mut stream = resp.bytes_stream();
-    let mut buffer = String::new();
+    let mut buffer: Vec<u8> = Vec::new();
     while let Some(chunk) = stream.next().await {
       let chunk = chunk.map_err(|e| ApiError::Network(e.to_string()))?;
-      buffer.push_str(&String::from_utf8_lossy(&chunk));
-      while let Some(idx) = find_event_boundary(&buffer) {
-        let (len, raw) = idx;
-        let event = raw;
-        buffer.drain(..len);
+      buffer.extend_from_slice(&chunk);
+      while let Some((consumed, end)) = find_event_boundary(&buffer) {
+        let event = String::from_utf8_lossy(&buffer[..end]).into_owned();
+        buffer.drain(..consumed);
         if let Some(data) = event_data(&event) {
           match serde_json::from_str::<E>(&data) {
             Ok(ev) => on_event(ev),
@@ -282,19 +290,35 @@ impl Client {
           }
         }
       }
+      if buffer.len() > MAX_SSE_EVENT_BYTES {
+        return Err(ApiError::Parse(format!("sse event exceeded {MAX_SSE_EVENT_BYTES} bytes with no boundary")));
+      }
     }
     Ok(())
   }
 }
 
-/// Find the first SSE event boundary (blank line); return `(consumed_len, event)`.
-fn find_event_boundary(buffer: &str) -> Option<(usize, String)> {
-  for sep in ["\r\n\r\n", "\n\n", "\r\r"] {
-    if let Some(i) = buffer.find(sep) {
-      return Some((i + sep.len(), buffer[..i].to_string()));
-    }
-  }
-  None
+/// The most one unterminated SSE event may buffer before the stream is refused.
+/// Matches the Go runtime's scanner cap, so a server cannot make one client
+/// allocate without bound while the other one stops it.
+const MAX_SSE_EVENT_BYTES: usize = 16 * 1024 * 1024;
+
+/// Find the first SSE event boundary (blank line); return `(bytes to consume,
+/// bytes of the event itself)`.
+///
+/// The spec treats CR, LF and CRLF as interchangeable line terminators, so the
+/// *earliest* separator wins rather than the first kind that occurs anywhere:
+/// taking the kind would swallow an intervening boundary and join two events
+/// into one payload that then fails to parse and kills the stream.
+fn find_event_boundary(buffer: &[u8]) -> Option<(usize, usize)> {
+  [b"\r\n\r\n".as_slice(), b"\n\n".as_slice(), b"\r\r".as_slice()]
+    .into_iter()
+    .filter_map(|sep| find_bytes(buffer, sep).map(|at| (at + sep.len(), at)))
+    .min_by_key(|(_, at)| *at)
+}
+
+fn find_bytes(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+  haystack.windows(needle.len()).position(|window| window == needle)
 }
 
 /// Join an SSE event's `data:` lines (spec: strip one leading space).
@@ -323,9 +347,11 @@ pub enum WsStatus {
 }
 
 /// Handlers for a WebSocket. Every callback is optional; `on_message` receives
-/// each JSON text frame decoded as `R`.
+/// each JSON text frame decoded as `R`, and `on_binary` each binary frame
+/// verbatim — a binary frame carries no type, so it is handed over undecoded.
 pub struct WsHandlers<R> {
   pub on_message: Option<Box<dyn FnMut(R) + Send>>,
+  pub on_binary: Option<Box<dyn FnMut(Vec<u8>) + Send>>,
   pub on_open: Option<Box<dyn FnMut() + Send>>,
   pub on_close: Option<Box<dyn FnMut() + Send>>,
   pub on_error: Option<Box<dyn FnMut(String) + Send>>,
@@ -334,31 +360,61 @@ pub struct WsHandlers<R> {
 
 impl<R> Default for WsHandlers<R> {
   fn default() -> Self {
-    Self { on_message: None, on_open: None, on_close: None, on_error: None, on_status: None }
+    Self { on_message: None, on_binary: None, on_open: None, on_close: None, on_error: None, on_status: None }
   }
 }
+
+/// One frame queued for the socket's write half.
+enum WsFrame {
+  Text(String),
+  Binary(Vec<u8>),
+}
+
+/// How many frames may wait in the send queue. Bounded on purpose: while the
+/// socket is down nothing drains it, and an unbounded queue would both grow
+/// without limit and flood a reconnected session with frames that assumed the
+/// state of the one before it.
+const WS_SEND_CAPACITY: usize = 256;
 
 /// A live WebSocket. Send frames with [`send`](Self::send); the receive loop
 /// runs on a background task and reconnects automatically until [`stop`](Self::stop).
 pub struct WsConnection<S> {
-  tx: tokio::sync::mpsc::UnboundedSender<String>,
+  tx: tokio::sync::mpsc::Sender<WsFrame>,
   stop: Arc<std::sync::atomic::AtomicBool>,
+  wake: Arc<tokio::sync::Notify>,
   _send: std::marker::PhantomData<fn(S)>,
 }
 
 impl<S: Serialize> WsConnection<S> {
-  /// JSON-serialize and send one frame. Returns `false` if the send channel is
-  /// closed (the socket is gone) or the value cannot be serialized.
+  /// JSON-serialize and send one frame. Returns `false` when the connection was
+  /// stopped, the socket is gone, the value cannot be serialized, or the send
+  /// queue is full — the frame is then *not* sent, and nothing is buffered on
+  /// the caller's behalf past the queue.
   pub fn send(&self, message: &S) -> bool {
     match serde_json::to_string(message) {
-      Ok(text) => self.tx.send(text).is_ok(),
+      Ok(text) => self.enqueue(WsFrame::Text(text)),
       Err(_) => false,
     }
   }
 
-  /// Close the socket and stop reconnecting.
+  /// Send one binary frame verbatim, under the same delivery contract as
+  /// [`send`](Self::send).
+  pub fn send_binary(&self, data: Vec<u8>) -> bool {
+    self.enqueue(WsFrame::Binary(data))
+  }
+
+  fn enqueue(&self, frame: WsFrame) -> bool {
+    if self.stop.load(std::sync::atomic::Ordering::SeqCst) {
+      return false;
+    }
+    self.tx.try_send(frame).is_ok()
+  }
+
+  /// Close the socket and stop reconnecting. The background task closes the
+  /// write half and exits, whether it is connected, mid-handshake or backing off.
   pub fn stop(&self) {
     self.stop.store(true, std::sync::atomic::Ordering::SeqCst);
+    self.wake.notify_one();
   }
 }
 
@@ -369,21 +425,41 @@ const KEEPALIVE_INTERVAL: std::time::Duration = std::time::Duration::from_secs(3
 
 impl Client {
   /// Open a bidirectional WebSocket. `S` is the frame type the client sends,
-  /// `R` the type the server pushes. The connection reconnects on non-manual
+  /// `R` the type the server pushes, and `query` is appended to the URL exactly
+  /// as a plain request would append it. The connection reconnects on non-manual
   /// close with exponential backoff.
-  pub fn ws<S, R>(&self, path: &str, mut handlers: WsHandlers<R>) -> WsConnection<S>
+  pub fn ws<S, R, Q>(&self, path: &str, query: Option<&Q>, mut handlers: WsHandlers<R>) -> WsConnection<S>
   where
     S: Serialize + Send + 'static,
     R: DeserializeOwned + Send + 'static,
+    Q: Serialize,
   {
     use futures_util::SinkExt;
     use futures_util::StreamExt;
 
-    let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<String>();
+    let (tx, mut rx) = tokio::sync::mpsc::channel::<WsFrame>(WS_SEND_CAPACITY);
     let stop = Arc::new(std::sync::atomic::AtomicBool::new(false));
-    let url = ws_url(&self.host, path);
+    let wake = Arc::new(tokio::sync::Notify::new());
     let headers = self.headers.clone();
     let stop_task = stop.clone();
+    let wake_task = wake.clone();
+
+    let url = match ws_url(&self.host, path, query) {
+      Ok(url) => url,
+      // The query cannot be serialized, so there is no socket to open. Report it
+      // the way a failed handshake reports, and hand back a stopped connection
+      // rather than one that silently subscribes without its filter.
+      Err(e) => {
+        if let Some(cb) = handlers.on_error.as_mut() {
+          cb(e.to_string());
+        }
+        if let Some(cb) = handlers.on_status.as_mut() {
+          cb(WsStatus::Stopped);
+        }
+        stop.store(true, std::sync::atomic::Ordering::SeqCst);
+        return WsConnection { tx, stop, wake, _send: std::marker::PhantomData };
+      }
+    };
 
     tokio::spawn(async move {
       let mut failures: u32 = 0;
@@ -434,27 +510,56 @@ impl Client {
             let mut keepalive = tokio::time::interval(KEEPALIVE_INTERVAL);
             keepalive.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Delay);
             keepalive.tick().await;
-            loop {
-              tokio::select! {
-                _ = keepalive.tick() => {
-                  if write.send(tokio_tungstenite::tungstenite::Message::Ping(Vec::new().into())).await.is_err() { break; }
-                },
-                outgoing = rx.recv() => match outgoing {
-                  Some(text) => { if write.send(tokio_tungstenite::tungstenite::Message::Text(text.into())).await.is_err() { break; } }
-                  None => { let _ = write.close().await; stop_task.store(true, std::sync::atomic::Ordering::SeqCst); break; }
-                },
-                incoming = read.next() => match incoming {
-                  Some(Ok(tokio_tungstenite::tungstenite::Message::Text(t))) => {
-                    match serde_json::from_str::<R>(&t) {
+
+            // The two halves are separate futures rather than two arms of one
+            // `select!`. An arm that awaits `write.send(…)` leaves `read.next()`
+            // unpolled for as long as that write is pending, so a peer slow to
+            // drain stalls the very frames — queued pongs included — that would
+            // let it drain, and both ends wait for the other.
+            let mut closed_by_us = false;
+            {
+              let writer = async {
+                loop {
+                  tokio::select! {
+                    _ = keepalive.tick() => {
+                      if write.send(tokio_tungstenite::tungstenite::Message::Ping(Vec::new().into())).await.is_err() { return false; }
+                    }
+                    outgoing = rx.recv() => match outgoing {
+                      Some(WsFrame::Text(text)) => { if write.send(tokio_tungstenite::tungstenite::Message::Text(text.into())).await.is_err() { return false; } }
+                      Some(WsFrame::Binary(data)) => { if write.send(tokio_tungstenite::tungstenite::Message::Binary(data.into())).await.is_err() { return false; } }
+                      // Every sender is gone, so nobody can ask for another
+                      // frame: close for good instead of reconnecting.
+                      None => { let _ = write.close().await; return true; }
+                    },
+                    _ = wake_task.notified() => { let _ = write.close().await; return true; }
+                  }
+                }
+              };
+              let reader = async {
+                while let Some(incoming) = read.next().await {
+                  match incoming {
+                    Ok(tokio_tungstenite::tungstenite::Message::Text(t)) => match serde_json::from_str::<R>(&t) {
                       Ok(msg) => { if let Some(cb) = handlers.on_message.as_mut() { cb(msg); } }
                       Err(e) => { if let Some(cb) = handlers.on_error.as_mut() { cb(e.to_string()); } }
-                    }
+                    },
+                    Ok(tokio_tungstenite::tungstenite::Message::Binary(data)) => { if let Some(cb) = handlers.on_binary.as_mut() { cb(data.into()); } }
+                    Ok(tokio_tungstenite::tungstenite::Message::Close(_)) => break,
+                    // Ping and Pong are answered by tungstenite itself, and
+                    // `Frame` only reaches the low-level API this client never
+                    // uses — named rather than swallowed by a `_`, so the next
+                    // frame kind forces a decision here.
+                    Ok(tokio_tungstenite::tungstenite::Message::Ping(_)) | Ok(tokio_tungstenite::tungstenite::Message::Pong(_)) | Ok(tokio_tungstenite::tungstenite::Message::Frame(_)) => {}
+                    Err(e) => { if let Some(cb) = handlers.on_error.as_mut() { cb(e.to_string()); } break; }
                   }
-                  Some(Ok(tokio_tungstenite::tungstenite::Message::Close(_))) | None => break,
-                  Some(Ok(_)) => {}
-                  Some(Err(e)) => { if let Some(cb) = handlers.on_error.as_mut() { cb(e.to_string()); } break; }
-                },
+                }
+              };
+              tokio::select! {
+                manual = writer => closed_by_us = manual,
+                _ = reader => {}
               }
+            }
+            if closed_by_us {
+              stop_task.store(true, std::sync::atomic::Ordering::SeqCst);
             }
             if let Some(cb) = handlers.on_close.as_mut() {
               cb();
@@ -469,19 +574,28 @@ impl Client {
         if stop_task.load(std::sync::atomic::Ordering::SeqCst) {
           break;
         }
+        // Frames queued while the socket was down assumed the session that just
+        // ended; the next one has none of that state, so they are dropped rather
+        // than replayed into it.
+        while rx.try_recv().is_ok() {}
         let backoff = std::cmp::min(15_000u64, 500u64.saturating_mul(1 << failures.min(5)));
         failures = failures.saturating_add(1);
-        tokio::time::sleep(std::time::Duration::from_millis(backoff)).await;
+        tokio::select! {
+          _ = tokio::time::sleep(std::time::Duration::from_millis(backoff)) => {}
+          _ = wake_task.notified() => break,
+        }
       }
       emit_status(&mut handlers, WsStatus::Stopped);
     });
 
-    WsConnection { tx, stop, _send: std::marker::PhantomData }
+    WsConnection { tx, stop, wake, _send: std::marker::PhantomData }
   }
 }
 
-/// Map the host's HTTP scheme onto the WebSocket one.
-fn ws_url(host: &str, path: &str) -> String {
+/// Map the host's HTTP scheme onto the WebSocket one and append `query` the way
+/// [`Client::url`] does, so a `Query<T>` handler is filtered identically whether
+/// it is reached over HTTP or over a socket.
+fn ws_url<Q: Serialize>(host: &str, path: &str, query: Option<&Q>) -> ApiResult<String> {
   let base = if let Some(rest) = host.strip_prefix("https://") {
     format!("wss://{rest}")
   } else if let Some(rest) = host.strip_prefix("http://") {
@@ -489,5 +603,13 @@ fn ws_url(host: &str, path: &str) -> String {
   } else {
     host.to_string()
   };
-  format!("{base}{path}")
+  let mut url = format!("{base}{path}");
+  if let Some(q) = query {
+    let qs = serde_qs::to_string(q).map_err(|e| ApiError::Parse(e.to_string()))?;
+    if !qs.is_empty() {
+      url.push('?');
+      url.push_str(&qs);
+    }
+  }
+  Ok(url)
 }

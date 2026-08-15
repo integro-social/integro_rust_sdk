@@ -11,5 +11,12 @@ pub enum PulseProcessStatus {
   Zombie,
   Idle,
   Dead,
+  Tracing,
+  Wakekill,
+  Waking,
+  Parked,
+  LockBlocked,
+  UninterruptibleDiskSleep,
+  Suspended,
   Unknown,
 }

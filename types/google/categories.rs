@@ -7,6 +7,6 @@ use crate::types::google::category::Category;
 #[serde(rename_all = "camelCase")]
 pub struct Categories {
   pub primary_category: Option<Category>,
-  #[cfg_attr(feature = "tapir", tapir(optional))]
+  #[cfg_attr(feature = "tapir", tapir(optional = nullable))]
   pub additional_categories: Vec<Category>,
 }

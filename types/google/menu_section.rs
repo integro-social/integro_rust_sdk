@@ -7,8 +7,8 @@ use crate::types::google::menu_label::MenuLabel;
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.google"))]
 #[serde(rename_all = "camelCase")]
 pub struct MenuSection {
-  #[cfg_attr(feature = "tapir", tapir(optional))]
+  #[cfg_attr(feature = "tapir", tapir(optional = nullable))]
   pub labels: Vec<MenuLabel>,
-  #[cfg_attr(feature = "tapir", tapir(optional))]
+  #[cfg_attr(feature = "tapir", tapir(optional = nullable))]
   pub items: Vec<MenuItem>,
 }

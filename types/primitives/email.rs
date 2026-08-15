@@ -8,7 +8,9 @@ use crate::types::validate::{check, check_all, Constraint, Preprocess, Validatio
 #[serde(transparent)]
 pub struct Email(String);
 
-const SPEC: ValidationSpec = ValidationSpec { preprocess: Preprocess::TrimLowercase, constraints: &[Constraint::MinLen(5), Constraint::MaxLen(254), Constraint::Regex { source: "^[a-zA-Z0-9_%+-]+(\\.[a-zA-Z0-9_%+-]+)*@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*\\.[a-zA-Z]{2,}$", hint: None }] };
+static SPEC_REGEX_0: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| regex::Regex::new("^[a-zA-Z0-9_%+-]+(\\.[a-zA-Z0-9_%+-]+)*@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*\\.[a-zA-Z]{2,}$").unwrap());
+
+const SPEC: ValidationSpec = ValidationSpec { preprocess: Preprocess::TrimLowercase, constraints: &[Constraint::MinLen(5), Constraint::MaxLen(254), Constraint::Regex { source: "^[a-zA-Z0-9_%+-]+(\\.[a-zA-Z0-9_%+-]+)*@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*\\.[a-zA-Z]{2,}$", compiled: || &SPEC_REGEX_0, hint: None }] };
 
 impl Email {
   /// The only producer: validates input, returns the value or the first violation.

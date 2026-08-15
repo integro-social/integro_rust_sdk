@@ -21,7 +21,11 @@ pub enum Constraint {
   MaxDigits(usize),
   NoControlChars,
   AsciiDigitsOnly,
-  Regex { source: &'static str, hint: Option<&'static str> },
+  /// `source` is the pattern (kept for reference); `compiled` hands back the
+  /// process-wide compiled form, so a check never pays a regex compilation and a
+  /// malformed pattern fails loudly at first use instead of reporting every
+  /// input as invalid.
+  Regex { source: &'static str, compiled: fn() -> &'static regex::Regex, hint: Option<&'static str> },
   RequireUppercase,
   RequireLowercase,
   RequireDigit,
@@ -50,9 +54,14 @@ pub enum Violation {
   ExactLength { expected: usize, actual: usize },
   TooFewDigits { min: usize },
   TooManyDigits { max: usize },
+  TooFewItems { min: usize },
+  TooManyItems { max: usize },
   InvalidFormat { hint: Option<&'static str> },
   InvalidChars,
+  InvalidCharAt { position: usize, character: char },
   NotDigits,
+  NotANumber,
+  NotABoolean,
   TooSmall { min: i64 },
   TooLarge { max: i64 },
   MissingUppercase,
@@ -70,10 +79,15 @@ impl Violation {
       Self::ExactLength { expected, actual } => format!("tamanho inválido (esperado {expected}, recebido {actual})"),
       Self::TooFewDigits { min } => format!("muito curto (mínimo {min} dígitos)"),
       Self::TooManyDigits { max } => format!("muito longo (máximo {max} dígitos)"),
+      Self::TooFewItems { min } => format!("poucos itens (mínimo {min})"),
+      Self::TooManyItems { max } => format!("muitos itens (máximo {max})"),
       Self::InvalidFormat { hint: None } => "formato inválido".to_owned(),
       Self::InvalidFormat { hint: Some(h) } => format!("formato inválido ({h})"),
       Self::InvalidChars => "caracteres inválidos".to_owned(),
+      Self::InvalidCharAt { position, character } => format!("caractere inválido na posição {position} ('{character}')"),
       Self::NotDigits => "deve conter apenas dígitos".to_owned(),
+      Self::NotANumber => "deve ser um número".to_owned(),
+      Self::NotABoolean => "deve ser verdadeiro ou falso".to_owned(),
       Self::TooSmall { min } => format!("muito pequeno (mínimo {min})"),
       Self::TooLarge { max } => format!("muito grande (máximo {max})"),
       Self::MissingUppercase => "deve conter uma letra maiúscula".to_owned(),
@@ -96,24 +110,31 @@ fn check_one(c: &Constraint, value: Value) -> Option<Violation> {
   let s = if let Value::Str(s) = value { s } else { "" };
   let has = |f: fn(char) -> bool| s.chars().any(f);
   match (c, value) {
-    (Constraint::MinLen(min), Value::Str(s)) => (s.len() < *min).then_some(Violation::TooShort { min: *min }),
-    (Constraint::MaxLen(max), Value::Str(s)) => (s.len() > *max).then_some(Violation::TooLong { max: *max }),
-    (Constraint::ExactLen(len), Value::Str(s)) => (s.len() != *len).then_some(Violation::ExactLength { expected: *len, actual: s.len() }),
+    // Length bounds count characters (Unicode scalar values), not UTF-8 bytes —
+    // the unit the "caracteres" message names, and the one validate.go and
+    // validate.ts count.
+    (Constraint::MinLen(min), Value::Str(s)) => (s.chars().count() < *min).then_some(Violation::TooShort { min: *min }),
+    (Constraint::MaxLen(max), Value::Str(s)) => (s.chars().count() > *max).then_some(Violation::TooLong { max: *max }),
+    (Constraint::ExactLen(len), Value::Str(s)) => {
+      let actual = s.chars().count();
+      (actual != *len).then_some(Violation::ExactLength { expected: *len, actual })
+    }
     (Constraint::MinDigits(min), Value::Str(s)) => (s.chars().filter(char::is_ascii_digit).count() < *min).then_some(Violation::TooFewDigits { min: *min }),
     (Constraint::MaxDigits(max), Value::Str(s)) => (s.chars().filter(char::is_ascii_digit).count() > *max).then_some(Violation::TooManyDigits { max: *max }),
     (Constraint::NoControlChars, Value::Str(s)) => s.chars().any(char::is_control).then_some(Violation::InvalidChars),
     (Constraint::AsciiDigitsOnly, Value::Str(s)) => (!s.chars().all(|c| c.is_ascii_digit())).then_some(Violation::NotDigits),
-    (Constraint::Regex { source, hint }, Value::Str(s)) => {
-      let ok = regex::Regex::new(source).map(|re| re.is_match(s)).unwrap_or(false);
-      (!ok).then_some(Violation::InvalidFormat { hint: *hint })
-    }
+    (Constraint::Regex { compiled, hint, .. }, Value::Str(s)) => (!compiled().is_match(s)).then_some(Violation::InvalidFormat { hint: *hint }),
     (Constraint::RequireUppercase, Value::Str(_)) => (!has(|c| c.is_uppercase())).then_some(Violation::MissingUppercase),
     (Constraint::RequireLowercase, Value::Str(_)) => (!has(|c| c.is_lowercase())).then_some(Violation::MissingLowercase),
     (Constraint::RequireDigit, Value::Str(_)) => (!has(|c| c.is_ascii_digit())).then_some(Violation::MissingDigit),
     (Constraint::RequireSymbol, Value::Str(_)) => (!has(|c| !c.is_alphanumeric())).then_some(Violation::MissingSymbol),
     (Constraint::Min(min), Value::Int(n)) => (n < *min).then_some(Violation::TooSmall { min: *min }),
     (Constraint::Max(max), Value::Int(n)) => (n > *max).then_some(Violation::TooLarge { max: *max }),
-    _ => None,
+    // The domain mismatches, stated rather than swept into a wildcard: a
+    // constraint variant added to the emitted enum then fails to compile here
+    // instead of validating as satisfied.
+    (Constraint::MinLen(_) | Constraint::MaxLen(_) | Constraint::ExactLen(_) | Constraint::MinDigits(_) | Constraint::MaxDigits(_) | Constraint::NoControlChars | Constraint::AsciiDigitsOnly | Constraint::Regex { .. } | Constraint::RequireUppercase | Constraint::RequireLowercase | Constraint::RequireDigit | Constraint::RequireSymbol, Value::Int(_)) => None,
+    (Constraint::Min(_) | Constraint::Max(_), Value::Str(_)) => None,
   }
 }
 

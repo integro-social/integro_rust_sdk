@@ -15,7 +15,7 @@ pub struct Question {
   pub upvote_count: Option<u32>,
   pub create_time: Option<String>,
   pub update_time: Option<String>,
-  #[cfg_attr(feature = "tapir", tapir(optional))]
+  #[cfg_attr(feature = "tapir", tapir(optional = nullable))]
   pub top_answers: Vec<Answer>,
   #[cfg_attr(feature = "tapir", tapir(optional = nullable))]
   pub total_answer_count: Option<u32>,

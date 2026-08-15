@@ -6,6 +6,6 @@ use crate::types::google::special_hour_period::SpecialHourPeriod;
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.google"))]
 #[serde(rename_all = "camelCase")]
 pub struct SpecialHours {
-  #[cfg_attr(feature = "tapir", tapir(optional))]
+  #[cfg_attr(feature = "tapir", tapir(optional = nullable))]
   pub special_hour_periods: Vec<SpecialHourPeriod>,
 }

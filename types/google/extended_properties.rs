@@ -9,8 +9,8 @@
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.google"))]
 #[serde(rename_all = "camelCase")]
 pub struct ExtendedProperties {
-  #[cfg_attr(feature = "tapir", tapir(optional))]
+  #[cfg_attr(feature = "tapir", tapir(optional = nullable))]
   pub private: std::collections::HashMap<String, String>,
-  #[cfg_attr(feature = "tapir", tapir(optional))]
+  #[cfg_attr(feature = "tapir", tapir(optional = nullable))]
   pub shared: std::collections::HashMap<String, String>,
 }

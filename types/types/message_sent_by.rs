@@ -16,4 +16,7 @@ pub enum MessageSentBy {
   /// Echo ingested from the platform — the paired phone, whatsapp web, the
   /// Meta business inbox — or imported history.
   Platform,
+  /// Sent by a linked GoHighLevel location through the conversation-provider
+  /// delivery webhook.
+  Ghl,
 }

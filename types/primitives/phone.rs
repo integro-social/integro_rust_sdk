@@ -8,7 +8,9 @@ use crate::types::validate::{check, check_all, Constraint, Preprocess, Validatio
 #[serde(transparent)]
 pub struct Phone(String);
 
-const SPEC: ValidationSpec = ValidationSpec { preprocess: Preprocess::Trim, constraints: &[Constraint::MinDigits(7), Constraint::MaxDigits(15), Constraint::Regex { source: "^\\+[1-9]\\d{6,14}$", hint: Some("esperado E.164: +<código do país><número>") }] };
+static SPEC_REGEX_0: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| regex::Regex::new("^\\+[1-9]\\d{6,14}$").unwrap());
+
+const SPEC: ValidationSpec = ValidationSpec { preprocess: Preprocess::Trim, constraints: &[Constraint::MinDigits(7), Constraint::MaxDigits(15), Constraint::Regex { source: "^\\+[1-9]\\d{6,14}$", compiled: || &SPEC_REGEX_0, hint: Some("esperado E.164: +<código do país><número>") }] };
 
 impl Phone {
   /// The only producer: validates input, returns the value or the first violation.

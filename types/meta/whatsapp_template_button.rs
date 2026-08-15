@@ -27,7 +27,7 @@ pub enum WhatsappTemplateButton {
   CopyCode {
     example: String,
   },
-  /// A button kind the hub does not model. Read-only, like
+  /// A button kind this crate does not model. Read-only, like
   /// [`WhatsappTemplateComponent::Unsupported`].
   Unsupported,
 }

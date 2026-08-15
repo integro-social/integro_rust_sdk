@@ -6,6 +6,6 @@
 #[serde(rename_all = "camelCase")]
 pub struct PhoneNumbers {
   pub primary_phone: Option<String>,
-  #[cfg_attr(feature = "tapir", tapir(optional))]
+  #[cfg_attr(feature = "tapir", tapir(optional = nullable))]
   pub additional_phones: Vec<String>,
 }
