@@ -10,5 +10,9 @@ pub struct ListMessagesQuery {
   pub social_account_uid: Option<Uid>,
   /// Poll cursor: only messages with `id` strictly greater are returned.
   pub since_id: u64,
+  /// Exact messages to return (≤200), for resolving rows a client already
+  /// holds by uid — the reply targets a loaded page quotes but does not
+  /// contain. Mutually exclusive with the poll cursor.
+  pub uids: Option<Vec<Uid>>,
   pub limit: Option<Number1_500>,
 }

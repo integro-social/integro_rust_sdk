@@ -3,6 +3,8 @@
 use crate::types::message::backfill_request::BackfillRequest;
 use crate::types::message::backfill_response::BackfillResponse;
 use crate::types::message::edit_message_request::EditMessageRequest;
+use crate::types::message::forward_message_request::ForwardMessageRequest;
+use crate::types::message::forward_outcome::ForwardOutcome;
 use crate::types::message::list_messages_query::ListMessagesQuery;
 use crate::types::database::message::Message;
 use crate::types::message::message_with_context::MessageWithContext;
@@ -73,8 +75,30 @@ pub async fn edit(__client: &crate::runtime::Client, conversation_uid: &str, mes
   __path = __path.replace("{message_uid}", &crate::runtime::encode_path(message_uid));
   __client.request(crate::runtime::Method::PUT, &__path, None::<&()>, Some(__body)).await
 }
+/// Forward a message into other conversations. Each target re-sends the
+/// stored content as an ordinary queued message: forwarding is the hub's own,
+/// so no channel's native forward flag is set and nothing marks the copy as
+/// forwarded — a target reads it as a message the account just wrote.
+///
+/// The content is re-shaped per target channel, so a forward crosses channels
+/// (a whatsapp photo into an instagram thread). Targets are answered one by
+/// one and independently: a target the caller cannot send in, whose channel
+/// cannot express the content, or whose 24h window has lapsed comes back
+/// `rejected` while the rest still queue.
+///
+/// Requires `ViewMessages` in the source conversation's group, and
+/// `SendMessages` in each target's — a target failing that is `rejected`, not
+/// an error.
+pub async fn forward(__client: &crate::runtime::Client, conversation_uid: &str, message_uid: &str, __body: &ForwardMessageRequest) -> crate::runtime::ApiResult<Vec<ForwardOutcome>> {
+  let mut __path = String::from("/conversation/{conversation_uid}/message/{message_uid}/forward");
+  __path = __path.replace("{conversation_uid}", &crate::runtime::encode_path(conversation_uid));
+  __path = __path.replace("{message_uid}", &crate::runtime::encode_path(message_uid));
+  __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
+}
 /// Poll the unified message feed across channels: messages with `id` greater
 /// than `since_id`, oldest first, optionally filtered by group or account.
+/// `uids` instead returns exactly those messages (≤200, order unspecified),
+/// for resolving rows the caller already holds by uid.
 ///
 /// Requires `ViewMessages`; the feed covers only messages of groups where the caller holds it.
 pub async fn list(__client: &crate::runtime::Client, __query: &ListMessagesQuery) -> crate::runtime::ApiResult<Vec<MessageWithContext>> {

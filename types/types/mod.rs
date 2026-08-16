@@ -17,6 +17,7 @@ pub mod issue_screenshot;
 pub mod issue_screenshots;
 pub mod issue_severity;
 pub mod issue_status;
+pub mod media_kind;
 pub mod membership_role;
 pub mod message_content;
 pub mod message_content_kind;
