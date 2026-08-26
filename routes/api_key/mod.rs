@@ -16,18 +16,20 @@ pub async fn count(__client: &crate::runtime::Client, __query: &ListApiKeysQuery
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
 /// Create an API key bound to a group or to the platform. A platform key (no
-/// group) automatically carries `operate_platform_scope`; a group-bound key may
-/// never carry it. Every granted permission must be one the caller itself holds
-/// in the key's scope, and must bring along whatever that permission requires.
+/// group) is the one that stands at platform scope — that comes from the
+/// binding itself, so nothing is added to the grant set — and a group-bound key
+/// may therefore carry no platform-scoped permission at all. Every granted
+/// permission must be one the caller itself holds in the key's scope, and must
+/// bring along whatever that permission requires.
 ///
-/// Requires `CreateApiKeys` and `GrantApiKeyPermissions` in the named group, or `OperatePlatformScope` plus both when no group is named.
+/// Requires `CreateApiKeys` and `GrantApiKeyPermissions` in the named group, or both at platform scope when no group is named; every permission granted to the key must also be one the caller holds where the key lives.
 pub async fn create(__client: &crate::runtime::Client, __body: &CreateApiKeyRequest) -> crate::runtime::ApiResult<CreateApiKeyResponse> {
   let mut __path = String::from("/api-key");
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
 }
 /// Fetch a single API key by uid.
 ///
-/// Requires `ViewApiKeys` in the key's group, or `OperatePlatformScope` plus `ViewApiKeys` for a platform key.
+/// Requires `ViewApiKeys` in the key's group, or `ViewApiKeys` at platform scope for a platform key.
 pub async fn get(__client: &crate::runtime::Client, api_key_uid: &str) -> crate::runtime::ApiResult<ApiKey> {
   let mut __path = String::from("/api-key/{api_key_uid}");
   __path = __path.replace("{api_key_uid}", &crate::runtime::encode_path(api_key_uid));
@@ -42,7 +44,7 @@ pub async fn list(__client: &crate::runtime::Client, __query: &ListApiKeysQuery)
 }
 /// Revoke an API key, permanently disabling it.
 ///
-/// Requires `RevokeApiKeys` in the key's group, or `OperatePlatformScope` plus `RevokeApiKeys` for a platform key.
+/// Requires `RevokeApiKeys` in the key's group, or `RevokeApiKeys` at platform scope for a platform key.
 pub async fn revoke(__client: &crate::runtime::Client, api_key_uid: &str) -> crate::runtime::ApiResult<()> {
   let mut __path = String::from("/api-key/{api_key_uid}/revoke");
   __path = __path.replace("{api_key_uid}", &crate::runtime::encode_path(api_key_uid));
@@ -50,7 +52,7 @@ pub async fn revoke(__client: &crate::runtime::Client, api_key_uid: &str) -> cra
 }
 /// Rotate an API key's secret, returning the new key.
 ///
-/// Requires `RotateApiKeys` in the key's group, or `OperatePlatformScope` plus `RotateApiKeys` for a platform key.
+/// Requires `RotateApiKeys` in the key's group, or `RotateApiKeys` at platform scope for a platform key.
 pub async fn rotate(__client: &crate::runtime::Client, api_key_uid: &str) -> crate::runtime::ApiResult<RotateApiKeyResponse> {
   let mut __path = String::from("/api-key/{api_key_uid}/rotate");
   __path = __path.replace("{api_key_uid}", &crate::runtime::encode_path(api_key_uid));
@@ -58,18 +60,18 @@ pub async fn rotate(__client: &crate::runtime::Client, api_key_uid: &str) -> cra
 }
 /// Update an API key's name or enabled flag.
 ///
-/// Requires `UpdateApiKeys` in the key's group, or `OperatePlatformScope` plus `UpdateApiKeys` for a platform key.
+/// Requires `UpdateApiKeys` in the key's group, or `UpdateApiKeys` at platform scope for a platform key.
 pub async fn update(__client: &crate::runtime::Client, api_key_uid: &str, __body: &UpdateApiKeyRequest) -> crate::runtime::ApiResult<()> {
   let mut __path = String::from("/api-key/{api_key_uid}");
   __path = __path.replace("{api_key_uid}", &crate::runtime::encode_path(api_key_uid));
   __client.request(crate::runtime::Method::PUT, &__path, None::<&()>, Some(__body)).await
 }
-/// Replace the granted permission set of an API key. `operate_platform_scope`
-/// stays bound to the key's group binding and cannot be granted to a group key;
-/// every other granted permission must be one the caller itself holds in the
+/// Replace the granted permission set of an API key. A platform-scoped
+/// permission is refused on a group-bound key, which never stands at platform
+/// scope; every granted permission must be one the caller itself holds in the
 /// key's scope, and must bring along whatever that permission requires.
 ///
-/// Requires `GrantApiKeyPermissions` in the key's group, or `OperatePlatformScope` plus `GrantApiKeyPermissions` for a platform key.
+/// Requires `GrantApiKeyPermissions` in the key's group, or at platform scope for a platform key; every permission granted must also be one the caller holds where the key lives.
 pub async fn update_permissions(__client: &crate::runtime::Client, api_key_uid: &str, __body: &UpdateApiKeyPermissionsRequest) -> crate::runtime::ApiResult<()> {
   let mut __path = String::from("/api-key/{api_key_uid}/permission");
   __path = __path.replace("{api_key_uid}", &crate::runtime::encode_path(api_key_uid));

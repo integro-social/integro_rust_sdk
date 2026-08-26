@@ -10,6 +10,7 @@
 pub enum MessageContentKind {
   Text,
   Image,
+  Sticker,
   Audio,
   Video,
   File,

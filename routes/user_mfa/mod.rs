@@ -10,14 +10,14 @@ pub mod factor;
 
 /// Dispatch a login MFA challenge for the chosen factor, emailing a one-time code for the email factor.
 ///
-/// Public — no authentication required; the request is gated solely by the ephemeral login MFA token in the body.
+/// Public — no authentication required; the request is gated by the ephemeral login MFA token in the body and — when the email factor is chosen — by the per-IP and per-token code-dispatch throttle.
 pub async fn dispatch(__client: &crate::runtime::Client, __body: &UserMfaDispatchRequest) -> crate::runtime::ApiResult<()> {
   let mut __path = String::from("/user-session/mfa/dispatch");
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
 }
 /// Verify a login MFA code and, on success, mint a user session token.
 ///
-/// Public — no authentication required; the request is gated solely by the ephemeral login MFA token in the body.
+/// Public — no authentication required; the request is gated by the ephemeral login MFA token in the body and by the per-IP and per-token verification throttle.
 pub async fn verify(__client: &crate::runtime::Client, __body: &UserMfaVerifyRequest) -> crate::runtime::ApiResult<UserMfaVerifyResponse> {
   let mut __path = String::from("/user-session/mfa/verify");
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await

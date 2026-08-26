@@ -12,7 +12,7 @@ pub async fn confirm(__client: &crate::runtime::Client, __body: &UserMfaEnrollCo
 }
 /// Begin self-service email-factor enrollment, emailing a one-time code and returning an enrollment token.
 ///
-/// Authenticated user acting on their own factors; no permission required.
+/// Authenticated user acting on their own factors; no permission required. Rejected when the caller trips the per-IP or per-token code-dispatch throttle.
 pub async fn start(__client: &crate::runtime::Client) -> crate::runtime::ApiResult<UserMfaMgmtEmailStartResponse> {
   let mut __path = String::from("/user-mfa/factor/email/start");
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, None::<&()>).await

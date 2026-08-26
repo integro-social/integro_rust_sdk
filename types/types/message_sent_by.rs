@@ -19,4 +19,6 @@ pub enum MessageSentBy {
   /// Sent by a linked GoHighLevel location through the conversation-provider
   /// delivery webhook.
   Ghl,
+  /// Dispatched by a campaign's scheduler; `sent_by_uid` is the campaign.
+  Campaign,
 }

@@ -32,6 +32,9 @@ pub enum UserPermission {
   ViewMessages,
   SendMessages,
   ManageMessages,
+  ImportContacts,
+  ViewCampaigns,
+  ManageCampaigns,
   ViewPosts,
   PublishPosts,
   UpdatePosts,
@@ -65,5 +68,4 @@ pub enum UserPermission {
   ViewPulse,
   ViewIssues,
   ManageIssues,
-  OperatePlatformScope,
 }

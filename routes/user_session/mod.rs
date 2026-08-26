@@ -15,7 +15,7 @@ pub async fn list(__client: &crate::runtime::Client, __query: &ListUserSessionsQ
 }
 /// Authenticate with email and password, returning a session token or an MFA/enrollment challenge.
 ///
-/// Public — no authentication required; the caller proves identity with the supplied email and password.
+/// Public — no authentication required; the caller proves identity with the supplied email and password. Rejected before the password is checked when the caller trips either the per-IP or the per-email login throttle.
 pub async fn login(__client: &crate::runtime::Client, __body: &UserSessionLoginRequest) -> crate::runtime::ApiResult<UserSessionLoginResponse> {
   let mut __path = String::from("/user-session/login");
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await

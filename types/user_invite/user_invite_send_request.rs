@@ -2,17 +2,18 @@
 #![allow(unused_imports, non_snake_case, non_camel_case_types, clippy::all)]
 use crate::types::primitives::email::Email;
 use crate::types::types::membership_role::MembershipRole;
-use crate::types::primitives::name::Name;
 use crate::types::primitives::uid::Uid;
 
 /// `group_uid` and `role` are a tied pair: both name the membership accepting
 /// the invitation grants, both absent invites to the platform alone. Half a
 /// pair is refused.
+///
+/// No name: the sender is naming a mailbox, not a person, and the account's
+/// name is chosen by whoever answers it.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.user_invite"))]
 pub struct UserInviteSendRequest {
   pub email: Email,
-  pub name: Name,
   pub group_uid: Option<Uid>,
   pub role: Option<MembershipRole>,
 }

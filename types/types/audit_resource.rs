@@ -28,5 +28,7 @@ pub enum AuditResource {
   UserGroup,
   Call,
   GhlLocation,
+  ContactImport,
+  Campaign,
   Unknown,
 }

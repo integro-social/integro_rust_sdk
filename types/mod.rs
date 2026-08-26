@@ -4,6 +4,8 @@ pub mod api_key;
 pub mod audit_log;
 pub mod axumy;
 pub mod call;
+pub mod campaign;
+pub mod contact_import;
 pub mod database;
 pub mod engagement;
 pub mod event;

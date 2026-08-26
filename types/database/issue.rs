@@ -5,7 +5,7 @@ use crate::types::types::issue_details::IssueDetails;
 use crate::types::types::issue_screenshots::IssueScreenshots;
 use crate::types::types::issue_severity::IssueSeverity;
 use crate::types::types::issue_status::IssueStatus;
-use crate::types::primitives::text8000::Text8000;
+use crate::types::primitives::text0_8000::Text0_8000;
 use crate::types::primitives::timestamp::Timestamp;
 use crate::types::primitives::uid::Uid;
 
@@ -17,7 +17,7 @@ pub struct Issue {
   pub category: IssueCategory,
   pub severity: IssueSeverity,
   pub status: IssueStatus,
-  pub description: Text8000,
+  pub description: Text0_8000,
   pub details: IssueDetails,
   pub screenshots: IssueScreenshots,
   pub reported_by: Uid,

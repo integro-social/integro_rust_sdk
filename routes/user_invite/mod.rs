@@ -3,13 +3,19 @@
 use crate::types::database::user_invite::UserInvite;
 use crate::types::user_invite::user_invite_accept_request::UserInviteAcceptRequest;
 use crate::types::user_invite::user_invite_accept_response::UserInviteAcceptResponse;
+use crate::types::user_invite::user_invite_detail_response::UserInviteDetailResponse;
+use crate::types::user_invite::user_invite_join_response::UserInviteJoinResponse;
+use crate::types::user_invite::user_invite_preview_response::UserInvitePreviewResponse;
 use crate::types::user_invite::user_invite_send_request::UserInviteSendRequest;
 use crate::types::user_invite::user_invite_send_response::UserInviteSendResponse;
+use crate::types::user_invite::user_invite_token_request::UserInviteTokenRequest;
 
 /// Accept an invitation by its token, creating the user account with the chosen
-/// password and, in the same transaction, the membership the invitation carries.
+/// name and password and, in the same transaction, the membership the
+/// invitation carries and a confirmed email MFA factor. Answers with the
+/// session the account is signed in under.
 ///
-/// Public — no authentication required; authorization comes from the invitation token in the request body.
+/// Public — no authentication required; authorization comes from the invitation token in the request body, whose delivery to the address is what the email factor would otherwise re-prove.
 pub async fn accept(__client: &crate::runtime::Client, __body: &UserInviteAcceptRequest) -> crate::runtime::ApiResult<UserInviteAcceptResponse> {
   let mut __path = String::from("/user-invite/accept");
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
@@ -21,6 +27,21 @@ pub async fn count(__client: &crate::runtime::Client) -> crate::runtime::ApiResu
   let mut __path = String::from("/user-invite/count");
   __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
 }
+/// The group an invitation offers, with the role and who sent it.
+///
+/// Authenticated, and only for the account the invitation was addressed to: a caller signed in as anybody else reads the token as not found. A POST because the token is a credential, not because it writes.
+pub async fn detail(__client: &crate::runtime::Client, __body: &UserInviteTokenRequest) -> crate::runtime::ApiResult<UserInviteDetailResponse> {
+  let mut __path = String::from("/user-invite/detail");
+  __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
+}
+/// Accept an invitation as the account it was addressed to, joining the group
+/// it offers with the role it carries.
+///
+/// Authenticated, and only for the account the invitation was addressed to; no permission is asked for, because the invitation is the grant.
+pub async fn join(__client: &crate::runtime::Client, __body: &UserInviteTokenRequest) -> crate::runtime::ApiResult<UserInviteJoinResponse> {
+  let mut __path = String::from("/user-invite/join");
+  __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
+}
 /// List pending (unaccepted) user invitations.
 ///
 /// Requires `ViewInvites`; the list covers only invites into groups where the caller holds it, and platform invites only for platform staff.
@@ -28,27 +49,44 @@ pub async fn list(__client: &crate::runtime::Client) -> crate::runtime::ApiResul
   let mut __path = String::from("/user-invite");
   __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
 }
-/// Refresh a pending user invitation's expiry and re-send its email.
+/// Serve the invited group's logo image.
 ///
-/// Requires `InviteUsers` in the invitation's group plus a role there that may hand out the invited one, or `OperatePlatformScope` for an invitation naming no group.
+/// Authenticated, and only for the account the invitation was addressed to; the invitation stands in for the `ViewGroups` the recipient does not hold yet. A POST because the token is a credential, not because it writes.
+pub async fn logo(__client: &crate::runtime::Client, __body: &UserInviteTokenRequest) -> crate::runtime::ApiResult<Vec<u8>> {
+  let mut __path = String::from("/user-invite/logo");
+  __client.request_bytes(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
+}
+/// Resolve an invitation link to the address it was sent to and whether
+/// accepting it means creating an account.
+///
+/// Public — no authentication required; the token in the body is the authorization, and the address it answers with is the one the token was mailed to. A POST because the token is a credential, not because it writes. Says nothing about the group: that is `userInvite.detail`.
+pub async fn preview(__client: &crate::runtime::Client, __body: &UserInviteTokenRequest) -> crate::runtime::ApiResult<UserInvitePreviewResponse> {
+  let mut __path = String::from("/user-invite/preview");
+  __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
+}
+/// Refresh a pending user invitation's expiry to 30 days from now and re-send its email, reusing the original link. An expired or already-accepted invitation is refused — issue a new one instead.
+///
+/// Requires `InviteUsers` in the invitation's group plus a role there that may hand out the invited one, or `InviteUsers` at platform scope for an invitation naming no group.
 pub async fn resend(__client: &crate::runtime::Client, invite_uid: &str) -> crate::runtime::ApiResult<()> {
   let mut __path = String::from("/user-invite/{invite_uid}/resend");
   __path = __path.replace("{invite_uid}", &crate::runtime::encode_path(invite_uid));
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, None::<&()>).await
 }
-/// Revoke a pending user invitation so its registration link can no longer be used.
+/// Revoke a pending user invitation so its link can no longer be used.
 ///
-/// Requires `InviteUsers` in the invitation's group plus a role there that may hand out the invited one, or `OperatePlatformScope` for an invitation naming no group.
+/// Requires `InviteUsers` in the invitation's group plus a role there that may hand out the invited one, or `InviteUsers` at platform scope for an invitation naming no group.
 pub async fn revoke(__client: &crate::runtime::Client, invite_uid: &str) -> crate::runtime::ApiResult<()> {
   let mut __path = String::from("/user-invite/{invite_uid}");
   __path = __path.replace("{invite_uid}", &crate::runtime::encode_path(invite_uid));
   __client.request(crate::runtime::Method::DELETE, &__path, None::<&()>, None::<&()>).await
 }
-/// Send an invitation that lets the recipient register a user account, joining
-/// the named group with the named role once accepted. Naming neither invites to
-/// the platform alone; naming only one of the two is refused.
+/// Send an invitation to an email address; the link it mails is good for 30 days. An address with no account yet is
+/// invited to register, joining the named group with the named role once it
+/// accepts; an address that already signs in is invited to the group alone.
+/// Naming neither group nor role invites to the platform, which only an address
+/// without an account can accept; naming only one of the two is refused.
 ///
-/// Requires `InviteUsers` in the named group plus a role there that may hand out the named one, or `OperatePlatformScope` when no group is named.
+/// Requires `InviteUsers` in the named group plus a role there that may hand out the named one, or `InviteUsers` at platform scope when no group is named.
 pub async fn send(__client: &crate::runtime::Client, __body: &UserInviteSendRequest) -> crate::runtime::ApiResult<UserInviteSendResponse> {
   let mut __path = String::from("/user-invite");
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await

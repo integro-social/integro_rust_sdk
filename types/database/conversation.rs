@@ -4,6 +4,7 @@ use crate::types::types::message_content_kind::MessageContentKind;
 use crate::types::types::message_direction::MessageDirection;
 use crate::types::types::message_sent_by::MessageSentBy;
 use crate::types::types::message_status::MessageStatus;
+use crate::types::primitives::name::Name;
 use crate::types::types::referral::Referral;
 use crate::types::primitives::timestamp::Timestamp;
 use crate::types::primitives::uid::Uid;
@@ -20,6 +21,11 @@ pub struct Conversation {
   pub participant_name: Option<String>,
   pub participant_username: Option<String>,
   pub participant_avatar_url: Option<String>,
+  /// The operator's own label for the person — set by hand or by a contact
+  /// import's name column. Independent of `participant_name`, which the
+  /// platform owns and profile refreshes overwrite; this is never touched by
+  /// them, and clearing it falls back to the platform name.
+  pub alias: Option<Name>,
   pub last_message_at: Timestamp,
   /// Last inbound (participant) message — anchors whatsapp's 24h window.
   pub last_inbound_at: Option<Timestamp>,

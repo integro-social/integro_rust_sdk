@@ -23,6 +23,12 @@ pub enum OutboundContent {
     url: String,
     caption: Option<String>,
   },
+  /// A whatsapp sticker: a webp with no caption, told apart from a photo so a
+  /// client can render it as one. Arrives on every whatsapp flavour; no
+  /// channel has a send shape for it yet, so a forward is refused.
+  Sticker {
+    url: String,
+  },
   Audio {
     url: String,
   },

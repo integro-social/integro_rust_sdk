@@ -12,7 +12,7 @@ use crate::types::event::server_msg::ServerMsg;
 /// re-validated continuously, so key revocation, permission edits, and
 /// session expiry close the connection mid-stream.
 ///
-/// Requires `ViewMessages` anywhere to connect; every event is then delivered only to a caller — human or API key alike — holding that family's permission in the event's own group: `ViewMessages` for message, presence and conversation events, `ViewComments` for comment and mention events, `ViewPosts` for post events, `ViewSocialAccounts` for account events, `ViewBusiness` for review events (events failing that check are silently absent).
+/// Requires `ViewMessages` anywhere to connect; every event is then delivered only to a caller — human or API key alike — holding that family's permission in the event's own group: `ViewMessages` for message, presence, conversation and call events, `ViewComments` for comment and mention events, `ViewPosts` for post events, `ViewSocialAccounts` for account events, `ViewBusiness` for review events (events failing that check are silently absent).
 pub fn ws(__client: &crate::runtime::Client, __handlers: crate::runtime::WsHandlers<ServerMsg>) -> crate::runtime::WsConnection<ClientMsg> {
   let mut __path = String::from("/event/ws");
   __client.ws(&__path, None::<&()>, __handlers)

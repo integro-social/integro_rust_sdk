@@ -15,10 +15,6 @@ pub async fn delete(__client: &crate::runtime::Client, media_uid: &str) -> crate
   __path = __path.replace("{media_uid}", &crate::runtime::encode_path(media_uid));
   __client.request(crate::runtime::Method::DELETE, &__path, None::<&()>, None::<&()>).await
 }
-/// Serve a hub-hosted media file. The uid may carry a cosmetic extension
-/// suffix (`{uid}.m4a`) — generated URLs include one as a format signal for
-/// external fetchers; it is stripped before lookup.
-///
 /// Public — no authentication required; the unguessable uid is the capability.
 pub async fn serve(__client: &crate::runtime::Client, media_uid: &str) -> crate::runtime::ApiResult<Vec<u8>> {
   let mut __path = String::from("/media/{media_uid}");
@@ -28,7 +24,7 @@ pub async fn serve(__client: &crate::runtime::Client, media_uid: &str) -> crate:
 /// Upload a media file to the hub; the returned public URL can be used in any
 /// message or post payload (Meta fetches it from the hub).
 ///
-/// Requires `UploadMedia` in the target group; group-scoped API keys upload into their own group, others must name it.
+/// Requires `UploadMedia` in the target group; group-scoped API keys upload into their own group, others must name it. A human caller is additionally rejected when they trip the per-user file-upload throttle.
 pub async fn upload(__client: &crate::runtime::Client, __form: reqwest::multipart::Form) -> crate::runtime::ApiResult<UploadMediaResponse> {
   let mut __path = String::from("/media");
   __client.request_multipart(crate::runtime::Method::POST, &__path, None::<&()>, __form).await

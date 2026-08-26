@@ -4,10 +4,12 @@ use crate::types::database::call::Call;
 use crate::types::database::conversation::Conversation;
 use crate::types::message::conversation_action_request::ConversationActionRequest;
 use crate::types::call::conversation_calls_query::ConversationCallsQuery;
+use crate::types::message::conversation_message_count_query::ConversationMessageCountQuery;
 use crate::types::message::conversation_messages_query::ConversationMessagesQuery;
 use crate::types::message::create_conversation_request::CreateConversationRequest;
 use crate::types::message::list_conversations_query::ListConversationsQuery;
 use crate::types::database::message::Message;
+use crate::types::message::set_conversation_alias_request::SetConversationAliasRequest;
 
 /// Send a presence signal into a conversation: mark_seen, typing_on, or
 /// typing_off. The payload is channel-tagged and the `channel` must match the
@@ -21,6 +23,16 @@ pub async fn action(__client: &crate::runtime::Client, conversation_uid: &str, _
   let mut __path = String::from("/conversation/{conversation_uid}/action");
   __path = __path.replace("{conversation_uid}", &crate::runtime::encode_path(conversation_uid));
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
+}
+/// Set or clear the operator's label for the contact. Independent of the
+/// platform-fetched participant name, which profile refreshes keep updating;
+/// clearing the alias falls back to it.
+///
+/// Requires `SendMessages` in the conversation's group.
+pub async fn alias(__client: &crate::runtime::Client, conversation_uid: &str, __body: &SetConversationAliasRequest) -> crate::runtime::ApiResult<Conversation> {
+  let mut __path = String::from("/conversation/{conversation_uid}/alias");
+  __path = __path.replace("{conversation_uid}", &crate::runtime::encode_path(conversation_uid));
+  __client.request(crate::runtime::Method::PUT, &__path, None::<&()>, Some(__body)).await
 }
 /// List a conversation's calls, newest first; `before_id` pages older history.
 ///
@@ -73,6 +85,15 @@ pub async fn list(__client: &crate::runtime::Client, __query: &ListConversations
   let mut __path = String::from("/conversation");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
+/// How many messages the conversation holds, narrowed by `kinds` like the
+/// list — what a media gallery shows as its total.
+///
+/// Requires `ViewMessages` in the conversation's group.
+pub async fn message_count(__client: &crate::runtime::Client, conversation_uid: &str, __query: &ConversationMessageCountQuery) -> crate::runtime::ApiResult<u64> {
+  let mut __path = String::from("/conversation/{conversation_uid}/message/count");
+  __path = __path.replace("{conversation_uid}", &crate::runtime::encode_path(conversation_uid));
+  __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
+}
 /// List a conversation's messages, newest first; `before_id` pages older
 /// history.
 ///
@@ -91,4 +112,10 @@ pub async fn read(__client: &crate::runtime::Client, conversation_uid: &str) -> 
   let mut __path = String::from("/conversation/{conversation_uid}/read");
   __path = __path.replace("{conversation_uid}", &crate::runtime::encode_path(conversation_uid));
   __client.request(crate::runtime::Method::PUT, &__path, None::<&()>, None::<&()>).await
+}
+/// How many conversations hold unread messages, across every group where the
+/// caller holds `ViewMessages` — the inbox badge.
+pub async fn unread_count(__client: &crate::runtime::Client) -> crate::runtime::ApiResult<u64> {
+  let mut __path = String::from("/conversation/unread");
+  __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
 }

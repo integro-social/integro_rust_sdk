@@ -17,7 +17,7 @@ pub async fn count(__client: &crate::runtime::Client) -> crate::runtime::ApiResu
 }
 /// Create a group, optionally with a logo image.
 ///
-/// Requires `CreateGroups`, which is only ever held platform-wide — no group exists yet to scope it to.
+/// Requires `CreateGroups`, which is only ever held platform-wide — no group exists yet to scope it to. Rejected — when a logo is attached — when the caller trips the per-user file-upload throttle.
 pub async fn create(__client: &crate::runtime::Client, __form: reqwest::multipart::Form) -> crate::runtime::ApiResult<CreateGroupResponse> {
   let mut __path = String::from("/group");
   __client.request_multipart(crate::runtime::Method::POST, &__path, None::<&()>, __form).await
@@ -71,7 +71,7 @@ pub async fn set_enabled(__client: &crate::runtime::Client, group_uid: &str, __b
 }
 /// Upload or replace a group's logo image.
 ///
-/// Requires `UpdateGroups` in the group itself.
+/// Requires `UpdateGroups` in the group itself, and is rejected when the caller trips the per-user file-upload throttle.
 pub async fn set_logo(__client: &crate::runtime::Client, group_uid: &str, __form: reqwest::multipart::Form) -> crate::runtime::ApiResult<()> {
   let mut __path = String::from("/group/{group_uid}/logo");
   __path = __path.replace("{group_uid}", &crate::runtime::encode_path(group_uid));

@@ -17,6 +17,8 @@ pub enum Constraint {
   MinLen(usize),
   MaxLen(usize),
   ExactLen(usize),
+  MinBytes(usize),
+  MaxBytes(usize),
   MinDigits(usize),
   MaxDigits(usize),
   NoControlChars,
@@ -52,6 +54,8 @@ pub enum Violation {
   TooShort { min: usize },
   TooLong { max: usize },
   ExactLength { expected: usize, actual: usize },
+  TooFewBytes { min: usize },
+  TooManyBytes { max: usize },
   TooFewDigits { min: usize },
   TooManyDigits { max: usize },
   TooFewItems { min: usize },
@@ -77,6 +81,8 @@ impl Violation {
       Self::TooShort { min } => format!("muito curto (mínimo {min} caracteres)"),
       Self::TooLong { max } => format!("muito longo (máximo {max} caracteres)"),
       Self::ExactLength { expected, actual } => format!("tamanho inválido (esperado {expected}, recebido {actual})"),
+      Self::TooFewBytes { min } => format!("muito curto (mínimo {min} bytes)"),
+      Self::TooManyBytes { max } => format!("muito longo (máximo {max} bytes)"),
       Self::TooFewDigits { min } => format!("muito curto (mínimo {min} dígitos)"),
       Self::TooManyDigits { max } => format!("muito longo (máximo {max} dígitos)"),
       Self::TooFewItems { min } => format!("poucos itens (mínimo {min})"),
@@ -119,6 +125,11 @@ fn check_one(c: &Constraint, value: Value) -> Option<Violation> {
       let actual = s.chars().count();
       (actual != *len).then_some(Violation::ExactLength { expected: *len, actual })
     }
+    // Byte bounds are the other unit, for a value that has to fit a fixed-width
+    // slot rather than read at a length: `str::len` here, TextEncoder in
+    // validate.ts, plain `len` in validate.go.
+    (Constraint::MinBytes(min), Value::Str(s)) => (s.len() < *min).then_some(Violation::TooFewBytes { min: *min }),
+    (Constraint::MaxBytes(max), Value::Str(s)) => (s.len() > *max).then_some(Violation::TooManyBytes { max: *max }),
     (Constraint::MinDigits(min), Value::Str(s)) => (s.chars().filter(char::is_ascii_digit).count() < *min).then_some(Violation::TooFewDigits { min: *min }),
     (Constraint::MaxDigits(max), Value::Str(s)) => (s.chars().filter(char::is_ascii_digit).count() > *max).then_some(Violation::TooManyDigits { max: *max }),
     (Constraint::NoControlChars, Value::Str(s)) => s.chars().any(char::is_control).then_some(Violation::InvalidChars),
@@ -133,7 +144,7 @@ fn check_one(c: &Constraint, value: Value) -> Option<Violation> {
     // The domain mismatches, stated rather than swept into a wildcard: a
     // constraint variant added to the emitted enum then fails to compile here
     // instead of validating as satisfied.
-    (Constraint::MinLen(_) | Constraint::MaxLen(_) | Constraint::ExactLen(_) | Constraint::MinDigits(_) | Constraint::MaxDigits(_) | Constraint::NoControlChars | Constraint::AsciiDigitsOnly | Constraint::Regex { .. } | Constraint::RequireUppercase | Constraint::RequireLowercase | Constraint::RequireDigit | Constraint::RequireSymbol, Value::Int(_)) => None,
+    (Constraint::MinLen(_) | Constraint::MaxLen(_) | Constraint::ExactLen(_) | Constraint::MinBytes(_) | Constraint::MaxBytes(_) | Constraint::MinDigits(_) | Constraint::MaxDigits(_) | Constraint::NoControlChars | Constraint::AsciiDigitsOnly | Constraint::Regex { .. } | Constraint::RequireUppercase | Constraint::RequireLowercase | Constraint::RequireDigit | Constraint::RequireSymbol, Value::Int(_)) => None,
     (Constraint::Min(_) | Constraint::Max(_), Value::Str(_)) => None,
   }
 }

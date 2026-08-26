@@ -13,7 +13,7 @@ pub async fn confirm(__client: &crate::runtime::Client, __body: &UserMfaEnrollCo
 }
 /// Begin email-factor enrollment during forced bootstrap, emailing a one-time code.
 ///
-/// Public — no authentication required; the request is gated solely by the ephemeral enrollment token in the body.
+/// Public — no authentication required; the request is gated by the ephemeral enrollment token in the body and by the per-IP and per-token code-dispatch throttle.
 pub async fn start(__client: &crate::runtime::Client, __body: &UserMfaEnrollEmailStartRequest) -> crate::runtime::ApiResult<()> {
   let mut __path = String::from("/user-session/mfa/enroll/email/start");
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await

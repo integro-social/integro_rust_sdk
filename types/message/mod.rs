@@ -2,6 +2,7 @@
 pub mod backfill_request;
 pub mod backfill_response;
 pub mod conversation_action_request;
+pub mod conversation_message_count_query;
 pub mod conversation_messages_query;
 pub mod create_conversation_request;
 pub mod create_template_request;
@@ -25,6 +26,7 @@ pub mod presence_signal;
 pub mod react_to_message_request;
 pub mod send_content;
 pub mod send_message_request;
+pub mod set_conversation_alias_request;
 pub mod stevo_content;
 pub mod stevo_send;
 pub mod template_response;

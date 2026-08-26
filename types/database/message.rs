@@ -40,6 +40,8 @@ pub struct Message {
   pub sent_by: Option<MessageSentBy>,
   /// The api key / user uid behind `sent_by`, when it names one.
   pub sent_by_uid: Option<Uid>,
+  /// The send sequence this queued row belongs to; `None` for every send that stands alone.
+  pub burst: Option<String>,
   /// Set when the message text was edited on the platform.
   pub edited_at: Option<Timestamp>,
   /// Set when the message was revoked on the platform; the row stays.

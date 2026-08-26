@@ -12,7 +12,7 @@ pub async fn confirm(__client: &crate::runtime::Client, __body: &UserPasswordRes
 }
 /// Issue a password-reset token and email a reset link to the address if it maps to an enabled account.
 ///
-/// Public — no authentication required.
+/// Public — no authentication required. Rejected when the caller trips either the per-IP or the per-email password-reset throttle.
 pub async fn request(__client: &crate::runtime::Client, __body: &UserPasswordResetStartRequest) -> crate::runtime::ApiResult<()> {
   let mut __path = String::from("/user-password-reset/request");
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await

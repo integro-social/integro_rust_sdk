@@ -2,7 +2,6 @@
 #![allow(unused_imports, non_snake_case, non_camel_case_types, clippy::all)]
 use crate::types::primitives::email::Email;
 use crate::types::types::membership_role::MembershipRole;
-use crate::types::primitives::name::Name;
 use crate::types::primitives::timestamp::Timestamp;
 use crate::types::primitives::uid::Uid;
 use crate::types::types::user_invite_email_status::UserInviteEmailStatus;
@@ -15,7 +14,6 @@ use crate::types::types::user_invite_email_status::UserInviteEmailStatus;
 pub struct UserInvite {
   pub uid: Uid,
   pub email: Email,
-  pub name: Name,
   pub invited_by: Uid,
   pub group_uid: Option<Uid>,
   pub role: Option<MembershipRole>,

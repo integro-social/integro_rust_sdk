@@ -2,8 +2,11 @@
 #![allow(unused_imports, non_snake_case, non_camel_case_types, clippy::all)]
 use crate::types::primitives::uid::Uid;
 
+/// The session the new account is already signed in with: accepting the
+/// invitation *is* the login, so nothing sends the recipient back to a form.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.user_invite"))]
 pub struct UserInviteAcceptResponse {
   pub uid: Uid,
+  pub token: Uid,
 }

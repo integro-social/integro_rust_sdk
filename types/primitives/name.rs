@@ -8,7 +8,7 @@ use crate::types::validate::{check, check_all, Constraint, Preprocess, Validatio
 #[serde(transparent)]
 pub struct Name(String);
 
-const SPEC: ValidationSpec = ValidationSpec { preprocess: Preprocess::Trim, constraints: &[Constraint::MinLen(3), Constraint::MaxLen(100), Constraint::NoControlChars] };
+const SPEC: ValidationSpec = ValidationSpec { preprocess: Preprocess::Trim, constraints: &[Constraint::MinLen(2), Constraint::MaxLen(100), Constraint::NoControlChars] };
 
 impl Name {
   /// The only producer: validates input, returns the value or the first violation.
@@ -23,7 +23,7 @@ impl Name {
 }
 
 #[cfg(feature = "tapir")]
-static TAPIR_SPEC: tapir::validation::ValidationSpec = tapir::validation::ValidationSpec { preprocess: tapir::validation::Preprocess::Trim, constraints: &[tapir::validation::Constraint::MinLen(3), tapir::validation::Constraint::MaxLen(100), tapir::validation::Constraint::NoControlChars] };
+static TAPIR_SPEC: tapir::validation::ValidationSpec = tapir::validation::ValidationSpec { preprocess: tapir::validation::Preprocess::Trim, constraints: &[tapir::validation::Constraint::MinLen(2), tapir::validation::Constraint::MaxLen(100), tapir::validation::Constraint::NoControlChars] };
 
 #[cfg(feature = "tapir")]
 impl tapir::validation::Validated for Name {
