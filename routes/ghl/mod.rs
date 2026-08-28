@@ -6,6 +6,7 @@ use crate::types::ghl::ghl_callback_query::GhlCallbackQuery;
 use crate::types::database::ghl_location::GhlLocation;
 use crate::types::ghl::link_ghl_request::LinkGhlRequest;
 use crate::types::ghl::list_ghl_query::ListGhlQuery;
+use crate::types::ghl::set_ghl_handoff_tag_request::SetGhlHandoffTagRequest;
 
 /// GoHighLevel OAuth redirect target: consumes the state, exchanges the code
 /// and registers (or reconnects) the location; always redirects the browser
@@ -47,14 +48,26 @@ pub async fn link(__client: &crate::runtime::Client, ghl_location_uid: &str, __b
   __path = __path.replace("{ghl_location_uid}", &crate::runtime::encode_path(ghl_location_uid));
   __client.request(crate::runtime::Method::PUT, &__path, None::<&()>, Some(__body)).await
 }
-/// List the GoHighLevel locations installed in a group, each carrying the
-/// whatsapp account it bridges (`target_account_uid`, null while unlinked) and
-/// whether its grant needs reconnecting.
+/// List the installed GoHighLevel locations, optionally filtered by group, each
+/// carrying the whatsapp account it bridges (`target_account_uid`, null while
+/// unlinked) and whether its grant needs reconnecting.
 ///
-/// Requires `ViewSocialAccounts` in the named group.
+/// Requires `ViewSocialAccounts`; the list covers only locations of groups where the caller holds it.
 pub async fn list(__client: &crate::runtime::Client, __query: &ListGhlQuery) -> crate::runtime::ApiResult<Vec<GhlLocation>> {
   let mut __path = String::from("/ghl");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
+}
+/// Set the contact tag the bridge adds on GoHighLevel's side when a human —
+/// a hub operator, or the paired phone — answers a contact, so a workflow
+/// keyed on that tag can put the location's Conversation AI bot to sleep.
+/// `null` turns the handoff off. Sends through the hub API, campaign sends and
+/// GoHighLevel's own never add it.
+///
+/// Requires `ConnectSocialAccounts` in the location's group.
+pub async fn set_handoff_tag(__client: &crate::runtime::Client, ghl_location_uid: &str, __body: &SetGhlHandoffTagRequest) -> crate::runtime::ApiResult<GhlLocation> {
+  let mut __path = String::from("/ghl/{ghl_location_uid}/handoff-tag");
+  __path = __path.replace("{ghl_location_uid}", &crate::runtime::encode_path(ghl_location_uid));
+  __client.request(crate::runtime::Method::PUT, &__path, None::<&()>, Some(__body)).await
 }
 /// Unbridge the location's whatsapp account, stopping the mirroring in both
 /// directions. The location stays installed and can be pointed at another

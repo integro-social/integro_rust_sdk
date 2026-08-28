@@ -5,3 +5,4 @@ pub mod ghl_callback_query;
 pub mod ghl_delivery_payload;
 pub mod link_ghl_request;
 pub mod list_ghl_query;
+pub mod set_ghl_handoff_tag_request;
