@@ -4,6 +4,6 @@
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.group"))]
 pub struct SetGroupLogoForm {
-  #[cfg_attr(feature = "tapir", tapir(type = "File"))]
+  #[cfg_attr(feature = "tapir", tapir(type = "File", rust = "Vec<u8>"))]
   pub logo: Vec<u8>,
 }

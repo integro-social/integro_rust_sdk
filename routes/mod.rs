@@ -14,6 +14,7 @@ pub mod conversation;
 pub mod event;
 pub mod event_webhook;
 pub mod ghl;
+pub mod gif;
 pub mod google;
 pub mod group;
 pub mod group_member;

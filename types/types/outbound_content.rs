@@ -36,6 +36,13 @@ pub enum OutboundContent {
     url: String,
     caption: Option<String>,
   },
+  /// A short looping clip played inline without sound — an mp4 the phone
+  /// draws as a GIF bubble rather than a video. Sendable natively; the other
+  /// channels have no gif shape, so a caller sends the same file to them as a
+  /// plain video.
+  Gif {
+    url: String,
+  },
   File {
     url: String,
     caption: Option<String>,

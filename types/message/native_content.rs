@@ -25,6 +25,11 @@ pub enum NativeContent {
     url: String,
     caption: Option<String>,
   },
+  /// An mp4 played inline as a looping gif: the phone draws a GIF bubble, not
+  /// a video player. No caption.
+  Gif {
+    url: String,
+  },
   File {
     url: String,
     caption: Option<String>,

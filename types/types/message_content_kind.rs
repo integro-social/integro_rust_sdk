@@ -13,6 +13,7 @@ pub enum MessageContentKind {
   Sticker,
   Audio,
   Video,
+  Gif,
   File,
   Location,
   Contacts,

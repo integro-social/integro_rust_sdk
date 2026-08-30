@@ -10,6 +10,7 @@ pub mod database;
 pub mod engagement;
 pub mod event;
 pub mod ghl;
+pub mod gif;
 pub mod google;
 pub mod google_account;
 pub mod group;

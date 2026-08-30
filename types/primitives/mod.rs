@@ -2,6 +2,7 @@
 pub mod email;
 pub mod name;
 pub mod number0_1439;
+pub mod number0_4999;
 pub mod number0_600000;
 pub mod number1000_86400000;
 pub mod number1024_107374182400;
@@ -21,6 +22,7 @@ pub mod phone;
 pub mod pin6;
 pub mod text0_2048;
 pub mod text0_255;
+pub mod text0_50;
 pub mod text0_8000;
 pub mod text1_255;
 pub mod timestamp;

@@ -7,6 +7,6 @@ use crate::types::primitives::uid::Uid;
 pub struct UploadMediaForm {
   /// Required for users and platform keys; group-bound keys imply their group.
   pub group_uid: Option<Uid>,
-  #[cfg_attr(feature = "tapir", tapir(type = "File"))]
+  #[cfg_attr(feature = "tapir", tapir(type = "File", rust = "Vec<u8>"))]
   pub file: Vec<u8>,
 }

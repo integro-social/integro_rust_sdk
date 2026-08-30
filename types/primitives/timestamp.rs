@@ -2,5 +2,5 @@
 #![allow(unused_imports, non_snake_case, non_camel_case_types, clippy::all)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-#[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.primitives", type = "number", brand))]
-pub struct Timestamp(pub f64);
+#[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.primitives", type = "number", rust = "i64", brand))]
+pub struct Timestamp(pub i64);

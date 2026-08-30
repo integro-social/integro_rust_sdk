@@ -21,6 +21,6 @@ pub struct UploadContactImportForm {
   pub name_column: Option<String>,
   /// Country calling code bare numbers are read against; defaults to `55`.
   pub default_calling_code: Option<String>,
-  #[cfg_attr(feature = "tapir", tapir(type = "File"))]
+  #[cfg_attr(feature = "tapir", tapir(type = "File", rust = "Vec<u8>"))]
   pub file: Vec<u8>,
 }

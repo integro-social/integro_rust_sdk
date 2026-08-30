@@ -10,7 +10,7 @@ pub struct ConversationMessagesQuery {
   pub before_id: Option<u64>,
   pub limit: Option<Number1_200>,
   /// Only messages of these content kinds. A media gallery pages
-  /// `image, video, sticker, audio, file` without loading the text between
-  /// them; absent or empty means every kind.
+  /// `image, video, gif, sticker, audio, file` without loading the text
+  /// between them; absent or empty means every kind.
   pub kinds: Option<Vec<MessageContentKind>>,
 }
