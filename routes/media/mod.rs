@@ -3,18 +3,11 @@
 use crate::types::media::upload_media_form::UploadMediaForm;
 use crate::types::media::upload_media_response::UploadMediaResponse;
 
-/// Delete a hub-hosted media file. The uid may carry the same cosmetic
-/// extension suffix the serve route accepts, so the URL handed back by upload
-/// can be deleted verbatim. Platform posts/messages already published with it
-/// keep working (Meta copies media on ingestion), but new sends referencing
-/// the URL will fail.
+/// Serve a hub-hosted media file. The uid may carry a cosmetic extension
+/// suffix (`{uid}.m4a`) — generated URLs include one as a format signal for
+/// external fetchers; it is stripped before lookup. A uid nothing names any
+/// more answers 404: the file went with its last referrer.
 ///
-/// Requires `DeleteMedia` in the media's group.
-pub async fn delete(__client: &crate::runtime::Client, media_uid: &str) -> crate::runtime::ApiResult<()> {
-  let mut __path = String::from("/media/{media_uid}");
-  __path = __path.replace("{media_uid}", &crate::runtime::encode_path(media_uid));
-  __client.request(crate::runtime::Method::DELETE, &__path, None::<&()>, None::<&()>).await
-}
 /// Public — no authentication required; the unguessable uid is the capability.
 pub async fn serve(__client: &crate::runtime::Client, media_uid: &str) -> crate::runtime::ApiResult<Vec<u8>> {
   let mut __path = String::from("/media/{media_uid}");
@@ -22,7 +15,11 @@ pub async fn serve(__client: &crate::runtime::Client, media_uid: &str) -> crate:
   __client.request_bytes(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
 }
 /// Upload a media file to the hub; the returned public URL can be used in any
-/// message or post payload (Meta fetches it from the hub).
+/// message or post payload (Meta fetches it from the hub). Bytes the hub
+/// already holds come back as the existing file — same uid, same URL. The
+/// URL stays valid while a message, post or campaign template names it, and
+/// for 24 hours after this upload otherwise; a third party handed the URL
+/// copies what it needs while it resolves.
 ///
 /// Requires `UploadMedia` in the target group; group-scoped API keys upload into their own group, others must name it. A human caller is additionally rejected when they trip the per-user file-upload throttle.
 pub async fn upload(__client: &crate::runtime::Client, __form: reqwest::multipart::Form) -> crate::runtime::ApiResult<UploadMediaResponse> {

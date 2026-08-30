@@ -50,7 +50,6 @@ pub enum UserPermission {
   ViewBusiness,
   ManageBusiness,
   UploadMedia,
-  DeleteMedia,
   ViewWebhook,
   ManageWebhook,
   ViewApiKeys,
