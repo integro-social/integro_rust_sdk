@@ -78,7 +78,9 @@ pub async fn delete(__client: &crate::runtime::Client, conversation_uid: &str) -
 /// List conversations, newest activity first, optionally filtered by group or
 /// social account; `before_activity_at`+`before_uid` page older activity
 /// (keyset cursor). Rows carry the denormalized chat-list summary (unread
-/// badge + last-message preview).
+/// badge + last-message preview). `q` narrows to conversations whose
+/// participant (alias, name, username, phone) contains it — a term under 2
+/// characters answers with no rows; not combinable with `uids`.
 ///
 /// Requires `ViewMessages`; the list covers only conversations of groups where the caller holds it.
 pub async fn list(__client: &crate::runtime::Client, __query: &ListConversationsQuery) -> crate::runtime::ApiResult<Vec<Conversation>> {
@@ -95,7 +97,9 @@ pub async fn message_count(__client: &crate::runtime::Client, conversation_uid: 
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
 /// List a conversation's messages, newest first; `before_id` pages older
-/// history.
+/// history. `after_id` pages newer history from an anchored message: each
+/// page is the oldest `limit` rows above the cursor, still newest-first on
+/// the wire (never both cursors).
 ///
 /// Requires `ViewMessages` in the conversation's group.
 pub async fn messages(__client: &crate::runtime::Client, conversation_uid: &str, __query: &ConversationMessagesQuery) -> crate::runtime::ApiResult<Vec<Message>> {

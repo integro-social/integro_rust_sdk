@@ -8,6 +8,10 @@ use crate::types::primitives::number1_200::Number1_200;
 pub struct ConversationMessagesQuery {
   /// Scrollback cursor: only messages with `id` strictly smaller are returned.
   pub before_id: Option<u64>,
+  /// Forward cursor: the oldest `limit` messages with `id` strictly greater,
+  /// returned newest-first — each page continues upward from the last.
+  /// Exclusive with `before_id`.
+  pub after_id: Option<u64>,
   pub limit: Option<Number1_200>,
   /// Only messages of these content kinds. A media gallery pages
   /// `image, video, gif, sticker, audio, file` without loading the text
