@@ -2,13 +2,13 @@
 #![allow(unused_imports, non_snake_case, non_camel_case_types, clippy::all)]
 use crate::types::primitives::uid::Uid;
 
-/// Forward one message into other conversations. Each target is re-sent as an
-/// ordinary message: the hub owns forwarding, so nothing marks the copy as
-/// forwarded on the platform or in storage.
+/// Forward one message into other conversations. Each target is re-sent as a
+/// message of its own that the hub marks as forwarded; native whatsapp shows
+/// the recipient the forwarded label, the other channels have no such marker.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.message"))]
 pub struct ForwardMessageRequest {
-  /// The conversations to forward into (≤20). Each is answered separately in
+  /// The conversations to forward into (≤5). Each is answered separately in
   /// the response; one refused target never blocks the others.
   pub targets: Vec<Uid>,
 }

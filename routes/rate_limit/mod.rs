@@ -2,19 +2,23 @@
 #![allow(unused_imports, unused_mut, clippy::all)]
 use crate::types::rate_limit::create_rate_limit_rule_request::CreateRateLimitRuleRequest;
 use crate::types::rate_limit::create_rate_limit_rule_response::CreateRateLimitRuleResponse;
-use crate::types::database::rate_limit_rule::RateLimitRule;
+use crate::types::rate_limit::list_rate_limit_rules_query::ListRateLimitRulesQuery;
+use crate::types::rate_limit::rate_limit_rule_response::RateLimitRuleResponse;
 use crate::types::rate_limit::update_rate_limit_rule_request::UpdateRateLimitRuleRequest;
 
-/// Create a rate-limit rule for any target kind (HTTP scope, action, email dispatch, or channel pacing).
+/// Create a rate-limit rule in a tier: one bucket shared by the whole
+/// platform, the per-caller global default, a staff override for one group,
+/// or a group's own (tighter) limit.
 ///
-/// Requires `CreateRateLimits`, which only platform staff hold.
+/// Requires `CreateRateLimits` — platform-wide for `shared`, `global` and
+/// `override`, in the group for `own`.
 pub async fn create(__client: &crate::runtime::Client, __body: &CreateRateLimitRuleRequest) -> crate::runtime::ApiResult<CreateRateLimitRuleResponse> {
   let mut __path = String::from("/rate-limit");
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
 }
 /// Delete a rate-limit rule by uid.
 ///
-/// Requires `DeleteRateLimits`, which only platform staff hold.
+/// Requires `DeleteRateLimits` in the rule's tier.
 pub async fn delete(__client: &crate::runtime::Client, rule_uid: &str) -> crate::runtime::ApiResult<()> {
   let mut __path = String::from("/rate-limit/{rule_uid}");
   __path = __path.replace("{rule_uid}", &crate::runtime::encode_path(rule_uid));
@@ -22,22 +26,24 @@ pub async fn delete(__client: &crate::runtime::Client, rule_uid: &str) -> crate:
 }
 /// Fetch a single rate-limit rule by uid.
 ///
-/// Requires `ViewRateLimits`, which only platform staff hold.
-pub async fn get(__client: &crate::runtime::Client, rule_uid: &str) -> crate::runtime::ApiResult<RateLimitRule> {
+/// Requires `ViewRateLimits` — anywhere for a shared or global rule, in the
+/// group for a group tier.
+pub async fn get(__client: &crate::runtime::Client, rule_uid: &str) -> crate::runtime::ApiResult<RateLimitRuleResponse> {
   let mut __path = String::from("/rate-limit/{rule_uid}");
   __path = __path.replace("{rule_uid}", &crate::runtime::encode_path(rule_uid));
   __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
 }
-/// List every rate-limit rule.
+/// List rate-limit rules across every tier the caller may see.
 ///
-/// Requires `ViewRateLimits`, which only platform staff hold.
-pub async fn list(__client: &crate::runtime::Client) -> crate::runtime::ApiResult<Vec<RateLimitRule>> {
+/// Requires `ViewRateLimits`.
+pub async fn list(__client: &crate::runtime::Client, __query: &ListRateLimitRulesQuery) -> crate::runtime::ApiResult<Vec<RateLimitRuleResponse>> {
   let mut __path = String::from("/rate-limit");
-  __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
+  __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
-/// Update an existing rate-limit rule's budget; the rule's target is immutable.
+/// Update an existing rate-limit rule's budget; the rule's target and tier
+/// are immutable.
 ///
-/// Requires `UpdateRateLimits`, which only platform staff hold.
+/// Requires `UpdateRateLimits` in the rule's tier.
 pub async fn update(__client: &crate::runtime::Client, rule_uid: &str, __body: &UpdateRateLimitRuleRequest) -> crate::runtime::ApiResult<()> {
   let mut __path = String::from("/rate-limit/{rule_uid}");
   __path = __path.replace("{rule_uid}", &crate::runtime::encode_path(rule_uid));

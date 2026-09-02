@@ -3,7 +3,7 @@
 use crate::types::ghl::connect_ghl_request::ConnectGhlRequest;
 use crate::types::ghl::connect_ghl_response::ConnectGhlResponse;
 use crate::types::ghl::ghl_callback_query::GhlCallbackQuery;
-use crate::types::database::ghl_location::GhlLocation;
+use crate::types::domain::ghl_location::GhlLocation;
 use crate::types::ghl::link_ghl_request::LinkGhlRequest;
 use crate::types::ghl::list_ghl_query::ListGhlQuery;
 use crate::types::ghl::set_ghl_handoff_tag_request::SetGhlHandoffTagRequest;

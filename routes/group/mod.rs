@@ -32,7 +32,7 @@ pub async fn delete(__client: &crate::runtime::Client, group_uid: &str) -> crate
 }
 /// Fetch a single group, optionally enriched with per-group counts.
 ///
-/// Requires `ViewGroups` in the group itself; each count is filled only when the caller also holds that count's own permission there — `ViewApiKeys` for `api_key_count`, `ViewMembers` for `member_count` — and is `null` otherwise.
+/// Requires `ViewGroups` in the group itself; each count is filled only when the caller also holds that count's own permission there — `ViewApiKeys` for `api_key_count`, `ViewMembers` for `member_count`, `ViewSocialAccounts` for `social_account_count` — and is `null` otherwise.
 pub async fn get(__client: &crate::runtime::Client, group_uid: &str, __query: &GroupQuery) -> crate::runtime::ApiResult<GroupResponse> {
   let mut __path = String::from("/group/{group_uid}");
   __path = __path.replace("{group_uid}", &crate::runtime::encode_path(group_uid));
@@ -48,7 +48,7 @@ pub async fn get_logo(__client: &crate::runtime::Client, group_uid: &str) -> cra
 }
 /// List groups, optionally enriched with per-group counts.
 ///
-/// Requires `ViewGroups`; the list covers only groups where the caller holds it, and each count is filled only for those where it also holds that count's own permission — `ViewApiKeys` for `api_key_count`, `ViewMembers` for `member_count` — `null` everywhere else.
+/// Requires `ViewGroups`; the list covers only groups where the caller holds it, and each count is filled only for those where it also holds that count's own permission — `ViewApiKeys` for `api_key_count`, `ViewMembers` for `member_count`, `ViewSocialAccounts` for `social_account_count` — `null` everywhere else.
 pub async fn list(__client: &crate::runtime::Client, __query: &GroupQuery) -> crate::runtime::ApiResult<Vec<GroupResponse>> {
   let mut __path = String::from("/group");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await

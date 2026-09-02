@@ -2,12 +2,12 @@
 #![allow(unused_imports, unused_mut, clippy::all)]
 use crate::types::campaign::audience_request::AudienceRequest;
 use crate::types::campaign::campaign_detail::CampaignDetail;
-use crate::types::database::campaign_recipient::CampaignRecipient;
+use crate::types::domain::campaign_recipient::CampaignRecipient;
 use crate::types::campaign::campaign_stats::CampaignStats;
 use crate::types::campaign::create_campaign_request::CreateCampaignRequest;
 use crate::types::campaign::list_campaigns_query::ListCampaignsQuery;
 use crate::types::campaign::list_recipients_query::ListRecipientsQuery;
-use crate::types::message::message_with_context::MessageWithContext;
+use crate::types::domain::message_with_context::MessageWithContext;
 use crate::types::campaign::preflight_report::PreflightReport;
 use crate::types::campaign::remove_recipients_request::RemoveRecipientsRequest;
 use crate::types::campaign::set_accounts_request::SetAccountsRequest;

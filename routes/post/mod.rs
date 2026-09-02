@@ -5,7 +5,7 @@ use crate::types::meta::insight::Insight;
 use crate::types::insight::insight_history_query::InsightHistoryQuery;
 use crate::types::insight::insight_series::InsightSeries;
 use crate::types::post::list_posts_query::ListPostsQuery;
-use crate::types::database::post::Post;
+use crate::types::domain::post::Post;
 use crate::types::post::post_insights_query::PostInsightsQuery;
 use crate::types::post::set_post_comments_request::SetPostCommentsRequest;
 use crate::types::post::set_post_hidden_request::SetPostHiddenRequest;
@@ -50,7 +50,7 @@ pub async fn insights(__client: &crate::runtime::Client, post_uid: &str, __query
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
 /// Day-by-day history of a post's collected metrics, grouped per metric —
-/// the charting companion to the live `post.insights` passthrough. Posts are
+/// the charting companion to the live insights passthrough. Posts are
 /// collected for 30 days after publishing (stories for 48h, after which their
 /// insights stop resolving), so the series flatlines after that window.
 ///

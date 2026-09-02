@@ -2,7 +2,7 @@
 #![allow(unused_imports, unused_mut, clippy::all)]
 use crate::types::issue::create_issue_form::CreateIssueForm;
 use crate::types::issue::create_issue_response::CreateIssueResponse;
-use crate::types::database::issue::Issue;
+use crate::types::domain::issue::Issue;
 use crate::types::issue::set_issue_status_request::SetIssueStatusRequest;
 
 /// Count issues.

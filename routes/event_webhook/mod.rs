@@ -3,7 +3,7 @@
 use crate::types::event::get_webhook_query::GetWebhookQuery;
 use crate::types::event::set_webhook_request::SetWebhookRequest;
 use crate::types::event::set_webhook_response::SetWebhookResponse;
-use crate::types::database::webhook::Webhook;
+use crate::types::domain::webhook::Webhook;
 
 /// Remove the group's outbound webhook, dropping its pending deliveries.
 ///

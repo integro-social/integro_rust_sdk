@@ -2,7 +2,7 @@
 #![allow(unused_imports, non_snake_case, non_camel_case_types, clippy::all)]
 use crate::types::primitives::pin6::Pin6;
 use crate::types::primitives::uid::Uid;
-use crate::types::types::user_mfa_kind::UserMfaKind;
+use crate::types::domain::user_mfa_kind::UserMfaKind;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.user_mfa"))]

@@ -23,6 +23,7 @@ pub mod mail_queue;
 pub mod media;
 pub mod mention;
 pub mod message;
+pub mod oauth;
 pub mod post;
 pub mod pulse;
 pub mod rate_limit;

@@ -6,8 +6,8 @@ use crate::types::message::edit_message_request::EditMessageRequest;
 use crate::types::message::forward_message_request::ForwardMessageRequest;
 use crate::types::message::forward_outcome::ForwardOutcome;
 use crate::types::message::list_messages_query::ListMessagesQuery;
-use crate::types::database::message::Message;
-use crate::types::message::message_with_context::MessageWithContext;
+use crate::types::domain::message::Message;
+use crate::types::domain::message_with_context::MessageWithContext;
 use crate::types::message::react_to_message_request::ReactToMessageRequest;
 use crate::types::message::send_message_request::SendMessageRequest;
 use crate::types::primitives::uid::Uid;
@@ -76,16 +76,16 @@ pub async fn edit(__client: &crate::runtime::Client, conversation_uid: &str, mes
   __client.request(crate::runtime::Method::PUT, &__path, None::<&()>, Some(__body)).await
 }
 /// Forward a message into other conversations. Each target re-sends the
-/// stored content as an ordinary queued message: forwarding is the hub's own,
-/// so no channel's native forward flag is set and nothing marks the copy as
-/// forwarded — a target reads it as a message the account just wrote.
+/// stored content as a queued message of its own, marked as forwarded: native
+/// whatsapp shows the recipient the forwarded label, the other channels carry
+/// no such marker and read it as a message the account just wrote.
 ///
 /// The content is re-shaped per target channel, so a forward crosses channels
 /// (a whatsapp photo into an instagram thread); a gif lands as a plain video
 /// anywhere but native whatsapp. Targets are answered one by one and
 /// independently: a target the caller cannot send in, whose channel cannot
 /// express the content, or whose 24h window has lapsed comes back `rejected`
-/// while the rest still queue.
+/// while the rest still queue. At most five targets per call.
 ///
 /// Requires `ViewMessages` in the source conversation's group, and
 /// `SendMessages` in each target's — a target failing that is `rejected`, not

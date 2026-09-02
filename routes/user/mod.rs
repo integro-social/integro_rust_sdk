@@ -5,7 +5,7 @@ use crate::types::user::create_user_response::CreateUserResponse;
 use crate::types::user::set_user_super_admin_request::SetUserSuperAdminRequest;
 use crate::types::user::update_user_request::UpdateUserRequest;
 use crate::types::user::update_user_self_request::UpdateUserSelfRequest;
-use crate::types::database::user::User;
+use crate::types::domain::user::User;
 use crate::types::user::user_change_password_request::UserChangePasswordRequest;
 use crate::types::user::user_self_response::UserSelfResponse;
 

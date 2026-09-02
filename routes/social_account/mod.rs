@@ -13,6 +13,8 @@ use crate::types::social_account::connect_stevo_request::ConnectStevoRequest;
 use crate::types::social_account::connect_stevo_response::ConnectStevoResponse;
 use crate::types::social_account::connect_whatsapp_request::ConnectWhatsappRequest;
 use crate::types::social_account::connect_whatsapp_response::ConnectWhatsappResponse;
+use crate::types::social_account::exposure_query::ExposureQuery;
+use crate::types::domain::exposure_report::ExposureReport;
 use crate::types::meta::insight::Insight;
 use crate::types::insight::insight_history_query::InsightHistoryQuery;
 use crate::types::insight::insight_series::InsightSeries;
@@ -22,7 +24,9 @@ use crate::types::social_account::native_qr_response::NativeQrResponse;
 use crate::types::social_account::refresh_profile_response::RefreshProfileResponse;
 use crate::types::social_account::session_status::SessionStatus;
 use crate::types::social_account::set_social_account_alias_request::SetSocialAccountAliasRequest;
+use crate::types::social_account::set_social_account_conversation_cap_request::SetSocialAccountConversationCapRequest;
 use crate::types::social_account::set_social_account_enabled_request::SetSocialAccountEnabledRequest;
+use crate::types::social_account::set_social_account_presence_request::SetSocialAccountPresenceRequest;
 use crate::types::social_account::social_account_response::SocialAccountResponse;
 use crate::types::social_account::start_native_pairing_response::StartNativePairingResponse;
 use crate::types::social_account::stevo_pair_request::StevoPairRequest;
@@ -104,6 +108,20 @@ pub async fn delete(__client: &crate::runtime::Client, social_account_uid: &str)
   __path = __path.replace("{social_account_uid}", &crate::runtime::encode_path(social_account_uid));
   __client.request(crate::runtime::Method::DELETE, &__path, None::<&()>, None::<&()>).await
 }
+/// Read the account's exposure telemetry, hour by hour over the requested
+/// period (at most 92 days): how many platform lookups it made (usync number
+/// checks, profile pictures, presence subscriptions), its sends by origin,
+/// first-time contacts, whatsapp 429 and 463/475 answers, slow send acks and
+/// sends still without a delivery receipt an hour later, plus the alerts the
+/// last 24 hours raise right now. Only the session-backed whatsapp channels
+/// are metered.
+///
+/// Requires `ViewSocialAccounts` in the account's group.
+pub async fn exposure(__client: &crate::runtime::Client, social_account_uid: &str, __query: &ExposureQuery) -> crate::runtime::ApiResult<ExposureReport> {
+  let mut __path = String::from("/social-account/{social_account_uid}/exposure");
+  __path = __path.replace("{social_account_uid}", &crate::runtime::encode_path(social_account_uid));
+  __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
+}
 /// Fetch a single connected social account by uid, with the live session
 /// status of its whatsapp session when applicable.
 ///
@@ -125,9 +143,9 @@ pub async fn insights(__client: &crate::runtime::Client, social_account_uid: &st
 }
 /// Day-by-day history of the account's collected metrics (reach, views,
 /// follower counts, …), grouped per metric — the charting companion to the
-/// live `socialAccount.insights` passthrough. History exists only from the
-/// day the account was connected. A channel that reports no insights is
-/// refused here exactly as the live endpoint refuses it.
+/// live insights passthrough. History exists only from the day the account
+/// was connected. A channel that reports no insights is refused here exactly
+/// as the live endpoint refuses it.
 ///
 /// Requires `ViewInsights` in the account's group.
 pub async fn insights_history(__client: &crate::runtime::Client, social_account_uid: &str, __query: &InsightHistoryQuery) -> crate::runtime::ApiResult<Vec<InsightSeries>> {
@@ -178,7 +196,8 @@ pub async fn native_qr(__client: &crate::runtime::Client, pairing_handle: &str) 
   __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
 }
 /// Re-establish the account's session after a drop; conflicts if the phone
-/// unpaired (re-pair with a new QR instead).
+/// unpaired (re-pair with a new QR instead) or while a whatsapp ban on the
+/// number is still in force, since logging back in during a ban lengthens it.
 ///
 /// Requires `ConnectSocialAccounts` in the account's group.
 pub async fn native_reconnect(__client: &crate::runtime::Client, social_account_uid: &str) -> crate::runtime::ApiResult<()> {
@@ -218,12 +237,38 @@ pub async fn set_alias(__client: &crate::runtime::Client, social_account_uid: &s
   __path = __path.replace("{social_account_uid}", &crate::runtime::encode_path(social_account_uid));
   __client.request(crate::runtime::Method::PUT, &__path, None::<&()>, Some(__body)).await
 }
+/// Cap how many conversations the hub may open on this account in any 24
+/// hours, whoever asks for them (inbox, api key, campaign, import, GoHighLevel),
+/// or lift the cap with `null`. Only the session-backed whatsapp channels enforce
+/// it; other channels are refused.
+///
+/// Requires `UpdateSocialAccounts` in the account's group.
+pub async fn set_conversation_cap(__client: &crate::runtime::Client, social_account_uid: &str, __body: &SetSocialAccountConversationCapRequest) -> crate::runtime::ApiResult<()> {
+  let mut __path = String::from("/social-account/{social_account_uid}/conversation-cap");
+  __path = __path.replace("{social_account_uid}", &crate::runtime::encode_path(social_account_uid));
+  __client.request(crate::runtime::Method::PUT, &__path, None::<&()>, Some(__body)).await
+}
 /// Enable or disable a connected social account; disabled accounts stop
-/// ingesting webhooks and reject sends/publishes.
+/// ingesting webhooks and reject sends/publishes. Enabling clears a session
+/// incident the next connect would clear anyway, leaves a reach-out hold to
+/// expire on its own, and conflicts while a whatsapp ban is still in force. Disabling a native whatsapp account also
+/// disconnects its session, and enabling connects it again.
 ///
 /// Requires `UpdateSocialAccounts` in the account's group.
 pub async fn set_enabled(__client: &crate::runtime::Client, social_account_uid: &str, __body: &SetSocialAccountEnabledRequest) -> crate::runtime::ApiResult<()> {
   let mut __path = String::from("/social-account/{social_account_uid}/enabled");
+  __path = __path.replace("{social_account_uid}", &crate::runtime::encode_path(social_account_uid));
+  __client.request(crate::runtime::Method::PUT, &__path, None::<&()>, Some(__body)).await
+}
+/// Choose how this native whatsapp account announces itself online: following
+/// the operators looking at its inbox (the default) or never. Takes effect on
+/// the live session at once. One change per account every 30 seconds; a
+/// sooner one is refused with the seconds left. Other channels have no
+/// presence to steer and are refused.
+///
+/// Requires `UpdateSocialAccounts` in the account's group.
+pub async fn set_presence(__client: &crate::runtime::Client, social_account_uid: &str, __body: &SetSocialAccountPresenceRequest) -> crate::runtime::ApiResult<()> {
+  let mut __path = String::from("/social-account/{social_account_uid}/presence");
   __path = __path.replace("{social_account_uid}", &crate::runtime::encode_path(social_account_uid));
   __client.request(crate::runtime::Method::PUT, &__path, None::<&()>, Some(__body)).await
 }
@@ -272,8 +317,9 @@ pub async fn stevo_qr(__client: &crate::runtime::Client, social_account_uid: &st
   __path = __path.replace("{social_account_uid}", &crate::runtime::encode_path(social_account_uid));
   __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
 }
-/// Re-establish the instance's session after a drop. Temporarily disabled —
-/// always fails with 503.
+/// Re-establish the instance's session after a drop; conflicts while a
+/// whatsapp ban on the number is still in force, since logging back in
+/// during a ban lengthens it. Temporarily disabled — always fails with 503.
 ///
 /// Requires `ConnectSocialAccounts` in the account's group.
 pub async fn stevo_reconnect(__client: &crate::runtime::Client, social_account_uid: &str) -> crate::runtime::ApiResult<()> {
@@ -282,10 +328,13 @@ pub async fn stevo_reconnect(__client: &crate::runtime::Client, social_account_u
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, None::<&()>).await
 }
 /// Live connection status of the instance (connected = session up; logged_in
-/// = phone paired). Reading it also refreshes the account's stored name and
-/// picture from the paired profile when they changed, emitting
-/// `account_updated` — the poll is the natural refresh point, since it already
-/// runs whenever the panel is open.
+/// = phone paired). Reading it also refreshes the account's stored name from
+/// the paired profile when it changed (the picture follows the daily profile
+/// sweep, which asks for it only once the gateway has echoed the account's
+/// own number), and reads the gateway's health report: a reported reach-out
+/// hold records a `reachout_timelock` session incident on the account, and its
+/// lifting clears it. Both emit `account_updated` — the poll is the natural
+/// refresh point, since it already runs whenever the panel is open.
 ///
 /// Requires `ViewSocialAccounts` in the account's group.
 pub async fn stevo_status(__client: &crate::runtime::Client, social_account_uid: &str) -> crate::runtime::ApiResult<StevoStatusResponse> {

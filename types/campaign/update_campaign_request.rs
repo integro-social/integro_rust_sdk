@@ -6,7 +6,7 @@ use crate::types::primitives::number1000_86400000::Number1000_86400000;
 use crate::types::primitives::number1_100000::Number1_100000;
 use crate::types::primitives::number1_127::Number1_127;
 use crate::types::primitives::number1_365::Number1_365;
-use crate::types::types::template_rotation::TemplateRotation;
+use crate::types::domain::template_rotation::TemplateRotation;
 use crate::types::primitives::timestamp::Timestamp;
 use crate::types::primitives::timezone::Timezone;
 
