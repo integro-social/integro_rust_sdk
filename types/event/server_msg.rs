@@ -31,6 +31,10 @@ pub enum ServerMsg {
   Error {
     message: String,
   },
+  /// Keepalive, every 30 seconds; nothing to answer. A client that hears no
+  /// frame at all for a few intervals should reconnect: a socket can die
+  /// without a close ever arriving.
+  Ping,
   /// The server is closing the connection (auth loss).
   Shutdown {
     reason: String,

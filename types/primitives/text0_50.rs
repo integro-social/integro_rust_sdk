@@ -8,7 +8,7 @@
 /// through [`Validated`], so a consumer sees the same rule the server enforces.
 use crate::types::validate::{check, check_all, Constraint, Preprocess, ValidationSpec, Value, Violation};
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.primitives"))]
 #[serde(transparent)]
 pub struct Text0_50(String);
@@ -25,6 +25,24 @@ impl Text0_50 {
   pub fn parse_all(value: &str) -> Vec<Violation> { check_all(&SPEC, Value::Str(value)) }
   pub fn value(&self) -> &str { &self.0 }
   pub fn spec() -> &'static ValidationSpec { &SPEC }
+}
+
+impl TryFrom<String> for Text0_50 {
+  type Error = Violation;
+  fn try_from(value: String) -> Result<Self, Violation> { Self::parse(value) }
+}
+
+impl std::str::FromStr for Text0_50 {
+  type Err = Violation;
+  fn from_str(value: &str) -> Result<Self, Violation> { Self::parse(value) }
+}
+
+impl AsRef<str> for Text0_50 {
+  fn as_ref(&self) -> &str { &self.0 }
+}
+
+impl std::fmt::Display for Text0_50 {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { f.write_str(&self.0) }
 }
 
 #[cfg(feature = "tapir")]

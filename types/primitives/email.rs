@@ -3,7 +3,7 @@
 
 use crate::types::validate::{check, check_all, Constraint, Preprocess, ValidationSpec, Value, Violation};
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.primitives"))]
 #[serde(transparent)]
 pub struct Email(String);
@@ -22,6 +22,24 @@ impl Email {
   pub fn parse_all(value: &str) -> Vec<Violation> { check_all(&SPEC, Value::Str(value)) }
   pub fn value(&self) -> &str { &self.0 }
   pub fn spec() -> &'static ValidationSpec { &SPEC }
+}
+
+impl TryFrom<String> for Email {
+  type Error = Violation;
+  fn try_from(value: String) -> Result<Self, Violation> { Self::parse(value) }
+}
+
+impl std::str::FromStr for Email {
+  type Err = Violation;
+  fn from_str(value: &str) -> Result<Self, Violation> { Self::parse(value) }
+}
+
+impl AsRef<str> for Email {
+  fn as_ref(&self) -> &str { &self.0 }
+}
+
+impl std::fmt::Display for Email {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { f.write_str(&self.0) }
 }
 
 #[cfg(feature = "tapir")]

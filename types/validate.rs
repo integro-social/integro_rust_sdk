@@ -104,6 +104,14 @@ impl Violation {
   }
 }
 
+impl std::fmt::Display for Violation {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    f.write_str(&self.message())
+  }
+}
+
+impl std::error::Error for Violation {}
+
 fn normalize<'a>(spec: &ValidationSpec, value: &'a str) -> std::borrow::Cow<'a, str> {
   match spec.preprocess {
     Preprocess::None => std::borrow::Cow::Borrowed(value),

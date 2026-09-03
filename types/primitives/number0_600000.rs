@@ -7,7 +7,7 @@
 /// — pick it to match the DB column so the newtype is the type end-to-end.
 use crate::types::validate::{check, check_all, Constraint, Preprocess, ValidationSpec, Value, Violation};
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.primitives"))]
 #[serde(transparent)]
 pub struct Number0_600000(i64);
@@ -23,6 +23,15 @@ impl Number0_600000 {
   pub fn parse_all(value: i64) -> Vec<Violation> { check_all(&SPEC, Value::Int(value)) }
   pub fn value(&self) -> i64 { self.0 }
   pub fn spec() -> &'static ValidationSpec { &SPEC }
+}
+
+impl TryFrom<i64> for Number0_600000 {
+  type Error = Violation;
+  fn try_from(value: i64) -> Result<Self, Violation> { Self::parse(value) }
+}
+
+impl std::fmt::Display for Number0_600000 {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { write!(f, "{}", self.0) }
 }
 
 #[cfg(feature = "tapir")]

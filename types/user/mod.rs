@@ -2,9 +2,12 @@
 pub mod create_user_request;
 pub mod create_user_response;
 pub mod membership_response;
+pub mod set_user_account_notification_request;
+pub mod set_user_notification_request;
 pub mod set_user_super_admin_request;
 pub mod update_user_request;
 pub mod update_user_self_request;
 pub mod user_change_password_request;
 pub mod user_membership_response;
+pub mod user_notification_response;
 pub mod user_self_response;
