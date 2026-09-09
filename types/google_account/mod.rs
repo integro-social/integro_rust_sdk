@@ -18,7 +18,6 @@ pub mod delete_business_reply_query;
 pub mod free_busy_request;
 pub mod free_busy_response;
 pub mod google_callback_query;
-pub mod google_capability;
 pub mod google_confirm_request;
 pub mod google_review;
 pub mod google_review_query;

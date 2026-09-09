@@ -19,12 +19,12 @@ pub struct SocialAccount {
   /// onto none.
   pub provider: Provider,
   /// Platform identity webhooks address: page id (facebook), ig user id
-  /// (instagram), or the provider's stable subject. Unique together with
-  /// `provider`.
+  /// (instagram), or the provider's stable subject. Not unique: every
+  /// connection of the same identity is its own account, sharing nothing
+  /// with the others.
   pub external_id: String,
-  /// The number behind a session-backed whatsapp account, once known: native
-  /// pairing states it, stevo hides it behind the api key until the gateway
-  /// echoes one of the account's own messages. `None` until then.
+  /// The number behind a session-backed whatsapp account, stated by the native
+  /// pairing. `None` for the other providers.
   pub phone: Option<String>,
   /// Backing Facebook Page — the send/publish path for both channels.
   pub page_id: String,

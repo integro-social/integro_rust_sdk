@@ -10,8 +10,9 @@ use crate::types::domain::quick_reply::QuickReply;
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.domain"))]
 pub struct MessengerSend {
   pub content: MessengerContent,
-  /// Lifts the standard 24h response window (`human_agent` = 7 days; the
-  /// Meta app must hold the `human_agent` permission).
+  /// A message tag that lifts the response window where the channel honors
+  /// it (`GET /channel`, `response_window.lift`); refused on any other
+  /// channel.
   pub tag: Option<MessageTag>,
   /// Up to 13 quick-reply chips.
   pub quick_replies: Option<Vec<QuickReply>>,

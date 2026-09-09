@@ -8,7 +8,7 @@ use crate::types::domain::social_account::SocialAccount;
 pub struct SocialAccountResponse {
   #[serde(flatten)]
   pub account: SocialAccount,
-  /// Live session status for the session-backed whatsapp channels
-  /// (native/stevo); null for channels without a session concept.
+  /// Live session status for the session-backed whatsapp channel (native);
+  /// null for channels without a session concept.
   pub session: Option<SessionStatus>,
 }

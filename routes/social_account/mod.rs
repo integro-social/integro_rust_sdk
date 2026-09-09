@@ -9,8 +9,6 @@ use crate::types::social_account::connect_review_response::ConnectReviewResponse
 use crate::types::social_account::connect_social_account_request::ConnectSocialAccountRequest;
 use crate::types::social_account::connect_social_account_response::ConnectSocialAccountResponse;
 use crate::types::social_account::connect_social_accounts_connected::ConnectSocialAccountsConnected;
-use crate::types::social_account::connect_stevo_request::ConnectStevoRequest;
-use crate::types::social_account::connect_stevo_response::ConnectStevoResponse;
 use crate::types::social_account::connect_whatsapp_request::ConnectWhatsappRequest;
 use crate::types::social_account::connect_whatsapp_response::ConnectWhatsappResponse;
 use crate::types::social_account::exposure_query::ExposureQuery;
@@ -29,42 +27,44 @@ use crate::types::social_account::set_social_account_enabled_request::SetSocialA
 use crate::types::social_account::set_social_account_presence_request::SetSocialAccountPresenceRequest;
 use crate::types::social_account::social_account_response::SocialAccountResponse;
 use crate::types::social_account::start_native_pairing_response::StartNativePairingResponse;
-use crate::types::social_account::stevo_pair_request::StevoPairRequest;
-use crate::types::social_account::stevo_pair_response::StevoPairResponse;
-use crate::types::social_account::stevo_qr_response::StevoQrResponse;
-use crate::types::social_account::stevo_status_response::StevoStatusResponse;
 
-/// Meta OAuth redirect target: consumes the state, exchanges the code, and
-/// stashes the grant snapshot for review — nothing is registered yet; always
-/// redirects the browser back to the frontend, with a review token on
-/// success.
+/// Login redirect target for both flows: consumes the state, reads the grant
+/// back (Meta: exchanges the code and lists the pages; gateway: lists the
+/// pages, instagram accounts or whatsapp numbers it covers) and stashes the
+/// snapshot for review — nothing is registered yet; always redirects the
+/// browser back to the frontend, with a review token on success.
 ///
 /// Public — no authentication required; authorization comes from the one-shot state token issued by `socialAccount.connect`.
 pub async fn callback(__client: &crate::runtime::Client, __query: &ConnectCallbackQuery) -> crate::runtime::ApiResult<()> {
   let mut __path = String::from("/social-account/callback");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
-/// Start the Meta OAuth flow for a group, returning the login dialog URL. The
-/// callback stashes the granted pages (and linked Instagram accounts) for
-/// review; `socialAccount.connectConfirm` is what registers the selection.
+/// Start a login flow for a group, returning the dialog URL: the hub's own
+/// Meta app (`meta`) or the alternate gateway's for one alt channel. The
+/// callback stashes the granted accounts for review;
+/// `socialAccount.connectConfirm` is what registers the selection. A login
+/// naming `social_account_uid` reconnects that account in place; any other
+/// registers new accounts, one per selection, however many times the same
+/// identity is already connected.
 ///
-/// Requires `ConnectSocialAccounts` in the named group.
+/// Requires `ConnectSocialAccounts` in the named group; a `social_account_uid` outside it, or not an account of the login's channel, reads as not found.
 pub async fn connect(__client: &crate::runtime::Client, __body: &ConnectSocialAccountRequest) -> crate::runtime::ApiResult<ConnectSocialAccountResponse> {
   let mut __path = String::from("/social-account/connect");
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
 }
 /// Register the selected accounts from a stashed grant (one-shot). Pages and
 /// instagram accounts are selected independently; unselected accounts stay in
-/// the Meta grant but out of the hub.
+/// the grant but out of the hub. A gateway selection is completed at the
+/// gateway and registered under its alt channel.
 ///
 /// Requires `ConnectSocialAccounts` in the group the stashed grant targets.
 pub async fn connect_confirm(__client: &crate::runtime::Client, __body: &ConnectConfirmRequest) -> crate::runtime::ApiResult<ConnectSocialAccountsConnected> {
   let mut __path = String::from("/social-account/connect/confirm");
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
 }
-/// Load a stashed Meta grant for the selection screen: every account it
-/// covers, plus group accounts whose stored token died on the Meta side
-/// (access removed) — those are flagged for reauthorization. Repeatable;
+/// Load a stashed grant for the selection screen: every account it covers,
+/// plus (Meta grants only) group accounts whose stored token died on the Meta
+/// side (access removed) — those are flagged for reauthorization. Repeatable;
 /// only confirm consumes the stash.
 ///
 /// Requires `ConnectSocialAccounts` in the group the stashed grant targets.
@@ -72,21 +72,12 @@ pub async fn connect_review(__client: &crate::runtime::Client, __query: &Connect
   let mut __path = String::from("/social-account/connect/review");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
-/// Connect a Stevo instance (unofficial WhatsApp gateway) to a group: the hub
-/// validates the server + apikey and registers the account. The webhook must
-/// be set manually in the Stevo panel. Pair the phone afterwards via the
-/// `stevo/qr` or `stevo/pair` sub-routes.
-///
-/// Requires `ConnectSocialAccounts` in the named group.
-pub async fn connect_stevo(__client: &crate::runtime::Client, __body: &ConnectStevoRequest) -> crate::runtime::ApiResult<ConnectStevoResponse> {
-  let mut __path = String::from("/social-account/stevo");
-  __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
-}
 /// Connect a WhatsApp Business Account to a group by manual provisioning: the
 /// hub discovers the WABA's phone numbers with the supplied permanent token,
-/// subscribes webhooks, and registers one social account per number.
+/// subscribes webhooks, and registers one new social account per number — or,
+/// naming `social_account_uid`, refreshes that account from its number alone.
 ///
-/// Requires `ConnectSocialAccounts` in the named group.
+/// Requires `ConnectSocialAccounts` in the named group; a `social_account_uid` outside it, or not an official whatsapp account, reads as not found.
 pub async fn connect_whatsapp(__client: &crate::runtime::Client, __body: &ConnectWhatsappRequest) -> crate::runtime::ApiResult<ConnectWhatsappResponse> {
   let mut __path = String::from("/social-account/whatsapp");
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
@@ -205,6 +196,16 @@ pub async fn native_reconnect(__client: &crate::runtime::Client, social_account_
   __path = __path.replace("{social_account_uid}", &crate::runtime::encode_path(social_account_uid));
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, None::<&()>).await
 }
+/// Ask the phone for a fresh QR code on a pairing whose code expired; the
+/// next `native/qr` poll carries it. Codes never renew on their own. The
+/// pairing's ten-minute window does not restart.
+///
+/// Requires `ConnectSocialAccounts` in the group the pairing targets; a pairing that already ended reads as not found.
+pub async fn native_renew_qr(__client: &crate::runtime::Client, pairing_handle: &str) -> crate::runtime::ApiResult<()> {
+  let mut __path = String::from("/social-account-pairing/{pairing_handle}/qr/renew");
+  __path = __path.replace("{pairing_handle}", &crate::runtime::encode_path(pairing_handle));
+  __client.request(crate::runtime::Method::POST, &__path, None::<&()>, None::<&()>).await
+}
 /// Live session status of a native account; a phone-side unpair reports
 /// `unpaired` instead of an error.
 ///
@@ -273,72 +274,13 @@ pub async fn set_presence(__client: &crate::runtime::Client, social_account_uid:
   __client.request(crate::runtime::Method::PUT, &__path, None::<&()>, Some(__body)).await
 }
 /// Start a native (whatsmeow) pairing; returns a handle to poll for the QR and
-/// the paired account. The account row is created only when the scan succeeds.
+/// the paired account. The account row is created only when the scan succeeds,
+/// and every scan is a new account — the same number paired twice is two
+/// accounts — unless `social_account_uid` names the one to pair again, whose
+/// number the scan must match.
 ///
-/// Requires `ConnectSocialAccounts` in the named group.
+/// Requires `ConnectSocialAccounts` in the named group; a `social_account_uid` outside it, or not a native account, reads as not found.
 pub async fn start_native_pairing(__client: &crate::runtime::Client, __body: &ConnectNativeRequest) -> crate::runtime::ApiResult<StartNativePairingResponse> {
   let mut __path = String::from("/social-account/native");
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
-}
-/// Close the instance's session without unpairing the phone. Temporarily
-/// disabled — always fails with 503.
-///
-/// Requires `ConnectSocialAccounts` in the account's group.
-pub async fn stevo_disconnect(__client: &crate::runtime::Client, social_account_uid: &str) -> crate::runtime::ApiResult<()> {
-  let mut __path = String::from("/social-account/{social_account_uid}/stevo/disconnect");
-  __path = __path.replace("{social_account_uid}", &crate::runtime::encode_path(social_account_uid));
-  __client.request(crate::runtime::Method::POST, &__path, None::<&()>, None::<&()>).await
-}
-/// Unpair the phone entirely (logout); re-pairing needs a new QR scan.
-/// Temporarily disabled — always fails with 503.
-///
-/// Requires `ConnectSocialAccounts` in the account's group.
-pub async fn stevo_logout(__client: &crate::runtime::Client, social_account_uid: &str) -> crate::runtime::ApiResult<()> {
-  let mut __path = String::from("/social-account/{social_account_uid}/stevo/session");
-  __path = __path.replace("{social_account_uid}", &crate::runtime::encode_path(social_account_uid));
-  __client.request(crate::runtime::Method::DELETE, &__path, None::<&()>, None::<&()>).await
-}
-/// Start QR-less pairing: returns the code the user types under "link with
-/// phone number" on the device. Temporarily disabled — always fails with 503.
-///
-/// Requires `ConnectSocialAccounts` in the account's group.
-pub async fn stevo_pair(__client: &crate::runtime::Client, social_account_uid: &str, __body: &StevoPairRequest) -> crate::runtime::ApiResult<StevoPairResponse> {
-  let mut __path = String::from("/social-account/{social_account_uid}/stevo/pair");
-  __path = __path.replace("{social_account_uid}", &crate::runtime::encode_path(social_account_uid));
-  __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
-}
-/// Fetch the instance's pairing QR code to render for the admin (valid while
-/// the instance is connected but not yet logged in). Temporarily disabled —
-/// always fails with 503.
-///
-/// Requires `ConnectSocialAccounts` in the account's group.
-pub async fn stevo_qr(__client: &crate::runtime::Client, social_account_uid: &str) -> crate::runtime::ApiResult<StevoQrResponse> {
-  let mut __path = String::from("/social-account/{social_account_uid}/stevo/qr");
-  __path = __path.replace("{social_account_uid}", &crate::runtime::encode_path(social_account_uid));
-  __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
-}
-/// Re-establish the instance's session after a drop; conflicts while a
-/// whatsapp ban on the number is still in force, since logging back in
-/// during a ban lengthens it. Temporarily disabled — always fails with 503.
-///
-/// Requires `ConnectSocialAccounts` in the account's group.
-pub async fn stevo_reconnect(__client: &crate::runtime::Client, social_account_uid: &str) -> crate::runtime::ApiResult<()> {
-  let mut __path = String::from("/social-account/{social_account_uid}/stevo/reconnect");
-  __path = __path.replace("{social_account_uid}", &crate::runtime::encode_path(social_account_uid));
-  __client.request(crate::runtime::Method::POST, &__path, None::<&()>, None::<&()>).await
-}
-/// Live connection status of the instance (connected = session up; logged_in
-/// = phone paired). Reading it also refreshes the account's stored name from
-/// the paired profile when it changed (the picture follows the daily profile
-/// sweep, which asks for it only once the gateway has echoed the account's
-/// own number), and reads the gateway's health report: a reported reach-out
-/// hold records a `reachout_timelock` session incident on the account, and its
-/// lifting clears it. Both emit `account_updated` — the poll is the natural
-/// refresh point, since it already runs whenever the panel is open.
-///
-/// Requires `ViewSocialAccounts` in the account's group.
-pub async fn stevo_status(__client: &crate::runtime::Client, social_account_uid: &str) -> crate::runtime::ApiResult<StevoStatusResponse> {
-  let mut __path = String::from("/social-account/{social_account_uid}/stevo/status");
-  __path = __path.replace("{social_account_uid}", &crate::runtime::encode_path(social_account_uid));
-  __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
 }

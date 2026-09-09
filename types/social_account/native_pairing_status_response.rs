@@ -9,4 +9,8 @@ pub struct NativePairingStatusResponse {
   pub status: NativePairingStatus,
   /// Set once `status` is `paired`.
   pub social_account_uid: Option<Uid>,
+  /// Set once `status` is `failed` for a scan the hub refused after the phone
+  /// accepted it — a repair scanned with another number, say — so the
+  /// operator learns why; absent on a plain timeout or platform failure.
+  pub failure: Option<String>,
 }

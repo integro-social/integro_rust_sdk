@@ -3,17 +3,13 @@
 use crate::types::primitives::uid::Uid;
 
 /// Channel-tagged link target — a GHL send names a bare phone number, so only
-/// the whatsapp flavors that can open a conversation from one can back a
+/// the whatsapp flavor that can open a conversation from one can back a
 /// location; no other channel's shape deserializes.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.ghl"))]
 #[serde(tag = "channel")]
 #[serde(rename_all = "snake_case")]
 pub enum LinkGhlRequest {
-  WhatsappStevo {
-    /// The whatsapp_stevo account to bridge — same group as the location.
-    target_account_uid: Uid,
-  },
   WhatsappNative {
     /// The whatsapp_native account to bridge — same group as the location.
     target_account_uid: Uid,

@@ -2,14 +2,13 @@
 #![allow(unused_imports, non_snake_case, non_camel_case_types, clippy::all)]
 use crate::types::message::message_edit::MessageEdit;
 
-/// Channel-tagged edit payload — only the unofficial WhatsApp flavors expose
-/// a platform edit call, so no other channel's shape deserializes. The
-/// `channel` must match the message's.
+/// Channel-tagged edit payload — only native WhatsApp exposes a platform
+/// edit call, so no other channel's shape deserializes. The `channel` must
+/// match the message's.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.message"))]
 #[serde(tag = "channel")]
 #[serde(rename_all = "snake_case")]
 pub enum EditMessageRequest {
-  WhatsappStevo(MessageEdit),
   WhatsappNative(MessageEdit),
 }

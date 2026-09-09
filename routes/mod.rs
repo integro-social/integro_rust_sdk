@@ -8,6 +8,7 @@ pub mod calendar;
 pub mod call;
 pub mod campaign;
 pub mod campaign_template;
+pub mod channel;
 pub mod comment;
 pub mod contact_import;
 pub mod conversation;

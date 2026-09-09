@@ -45,8 +45,8 @@ pub async fn cancel(__client: &crate::runtime::Client, campaign_uid: &str) -> cr
   __path = __path.replace("{campaign_uid}", &crate::runtime::encode_path(campaign_uid));
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, None::<&()>).await
 }
-/// Create a draft campaign in a group. Its accounts are the group's whatsapp
-/// accounts (native or Stevo, mixed freely); nothing sends until templates,
+/// Create a draft campaign in a group. Its accounts are the group's native
+/// whatsapp accounts; nothing sends until templates,
 /// accounts and an audience exist and `start` passes the preflight.
 ///
 /// Requires `ManageCampaigns` in the target group; group-scoped API keys create into their own group, others must name it.
@@ -133,8 +133,7 @@ pub async fn resume(__client: &crate::runtime::Client, campaign_uid: &str) -> cr
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, None::<&()>).await
 }
 /// Replace the participating account set. Draft, paused and done only; every
-/// account must be a whatsapp (native or Stevo) account of the campaign's
-/// group. Queued recipients of an account taken out are handed to the
+/// account must be a native whatsapp account of the campaign's group. Queued recipients of an account taken out are handed to the
 /// accounts that remain, balanced and preferring one that already knows
 /// them; rows that already ran stay. The set may be empty — the queue then
 /// waits for the next account change — and the campaign cannot start until

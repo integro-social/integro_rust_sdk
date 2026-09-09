@@ -14,6 +14,8 @@ pub enum ConversationActionRequest {
   Facebook(PresenceSignal),
   Instagram(PresenceSignal),
   Whatsapp(WhatsappPresenceSignal),
-  WhatsappStevo(PresenceSignal),
   WhatsappNative(PresenceSignal),
+  FacebookAlt(PresenceSignal),
+  InstagramAlt(PresenceSignal),
+  WhatsappAlt(WhatsappPresenceSignal),
 }

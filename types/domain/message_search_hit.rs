@@ -15,7 +15,13 @@ pub struct MessageSearchHit {
   pub id: u64,
   pub conversation_uid: Uid,
   pub social_account_uid: Uid,
+  /// The conversation's alias, the contact's name or their username, in that
+  /// order; `None` when the contact carries none of them.
   pub conversation_name: Option<String>,
+  /// The contact's platform id (wa_id, PSID, IGSID) and username, so a
+  /// nameless conversation still reads as its phone or handle.
+  pub participant_id: String,
+  pub participant_username: Option<String>,
   pub participant_avatar_url: Option<String>,
   pub direction: MessageDirection,
   pub sent_at: Timestamp,

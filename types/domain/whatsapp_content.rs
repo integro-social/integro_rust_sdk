@@ -23,8 +23,12 @@ pub enum WhatsappContent {
     url: String,
     caption: Option<String>,
   },
+  /// `voice` sends it as a voice note (push-to-talk); the file must then be
+  /// ogg/opus, which WhatsApp draws with the waveform. A plain audio file
+  /// arrives as an attachment.
   Audio {
     url: String,
+    voice: bool,
   },
   Video {
     url: String,

@@ -11,6 +11,9 @@ pub enum MessengerContent {
   Text {
     text: String,
   },
+  /// A picture; an animated `.gif` animates on facebook. Instagram has no
+  /// animated picture, so there a `.gif` goes out as the mp4 clip the app
+  /// plays, while the stored message keeps the gif.
   Image {
     url: String,
   },

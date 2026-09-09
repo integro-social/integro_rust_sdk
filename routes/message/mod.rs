@@ -12,12 +12,12 @@ use crate::types::message::react_to_message_request::ReactToMessageRequest;
 use crate::types::message::send_message_request::SendMessageRequest;
 use crate::types::primitives::uid::Uid;
 
-/// Import conversation history from Meta's Conversations API for an account
-/// — DMs that predate the account's connection. The payload is
-/// channel-tagged and must match the account's channel — only facebook and
-/// instagram expose history, so no other channel's shape deserializes. Runs
-/// only when explicitly invoked; already-imported messages dedup by platform
-/// mid.
+/// Import conversation history for an account — DMs that predate the
+/// account's connection: Meta's Conversations API for facebook and
+/// instagram, the gateway's replayed history for facebook_alt and
+/// instagram_alt. The payload is channel-tagged and must match the
+/// account's channel; no other channel's shape deserializes. Runs only when
+/// explicitly invoked; already-imported messages dedup by platform mid.
 ///
 /// Requires `ManageMessages` in the account's group.
 pub async fn backfill(__client: &crate::runtime::Client, __body: &BackfillRequest) -> crate::runtime::ApiResult<BackfillResponse> {
@@ -52,8 +52,7 @@ pub async fn cancel(__client: &crate::runtime::Client, conversation_uid: &str, m
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, None::<&()>).await
 }
 /// Revoke an own sent message for everyone ("apagar para todos") —
-/// whatsapp_stevo and whatsapp_native only; the row stays with `deleted_at`
-/// set.
+/// whatsapp_native only; the row stays with `deleted_at` set.
 ///
 /// Requires `ManageMessages` in the conversation's group.
 pub async fn delete(__client: &crate::runtime::Client, conversation_uid: &str, message_uid: &str) -> crate::runtime::ApiResult<()> {
@@ -64,9 +63,8 @@ pub async fn delete(__client: &crate::runtime::Client, conversation_uid: &str, m
 }
 /// Edit an own sent message's text (or media caption) on the platform. The
 /// payload is channel-tagged and must match the message's channel — only
-/// whatsapp_stevo and whatsapp_native expose an edit call, so no other
-/// channel's shape deserializes; the platform enforces its ~15 minute edit
-/// window.
+/// whatsapp_native exposes an edit call, so no other channel's shape
+/// deserializes; the platform enforces its ~15 minute edit window.
 ///
 /// Requires `ManageMessages` in the conversation's group.
 pub async fn edit(__client: &crate::runtime::Client, conversation_uid: &str, message_uid: &str, __body: &EditMessageRequest) -> crate::runtime::ApiResult<Message> {
@@ -107,8 +105,8 @@ pub async fn list(__client: &crate::runtime::Client, __query: &ListMessagesQuery
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
 /// React to a message through the platform. The payload is channel-tagged
-/// and must match the message's channel; Messenger has no reaction API and
-/// no payload variant.
+/// and must match the message's channel; Instagram takes Meta's reaction
+/// name, every other channel the emoji itself.
 ///
 /// Requires `SendMessages` in the conversation's group.
 pub async fn react(__client: &crate::runtime::Client, conversation_uid: &str, message_uid: &str, __body: &ReactToMessageRequest) -> crate::runtime::ApiResult<()> {
@@ -119,9 +117,13 @@ pub async fn react(__client: &crate::runtime::Client, conversation_uid: &str, me
 }
 /// Send a message into a conversation. The payload is channel-tagged and
 /// must match the conversation's channel — each variant accepts exactly the
-/// fields and content kinds its channel can deliver. Official WhatsApp
-/// free-form sends require an inbound message within 24h; outside the window
-/// only `template` content passes (the unofficial flavors have no window).
+/// fields and content kinds its channel can deliver. Free-form sends must fall
+/// inside the channel's response window (`GET /channel`): an inbound message
+/// within the window's hours, or past that only what the window lifts by — a
+/// `template` on official and alt WhatsApp, a `tag` on a channel whose window
+/// honors it. Beyond that the send is refused as `window_expired`; a `tag` the
+/// channel does not honor is refused (400) before anything reaches the
+/// platform. The native flavor has no window.
 ///
 /// Sends are always queued: the message comes back as `pending`, nothing has
 /// reached the platform yet, and a `message_queued` event fires. A per-account
@@ -141,8 +143,8 @@ pub async fn send(__client: &crate::runtime::Client, conversation_uid: &str, __b
   __path = __path.replace("{conversation_uid}", &crate::runtime::encode_path(conversation_uid));
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
 }
-/// Remove the account's reaction from a message (Instagram and the WhatsApp
-/// flavors — Messenger has no reaction API).
+/// Remove the account's reaction from a message (Instagram, the WhatsApp
+/// flavors and the alt channels — Messenger has no reaction API).
 ///
 /// Requires `SendMessages` in the conversation's group.
 pub async fn unreact(__client: &crate::runtime::Client, conversation_uid: &str, message_uid: &str) -> crate::runtime::ApiResult<()> {

@@ -22,6 +22,7 @@ pub mod presence_signal;
 pub mod react_to_message_request;
 pub mod send_message_request;
 pub mod set_conversation_alias_request;
+pub mod template_opener;
 pub mod template_response;
 pub mod webhook_verify_query;
 pub mod whatsapp_presence_signal;

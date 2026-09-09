@@ -4,8 +4,8 @@ use crate::types::domain::channel::Channel;
 use crate::types::primitives::uid::Uid;
 
 /// A group account whose stored token no longer works — access was removed
-/// on the Meta side. Flagged `needs_reauth`; reconnecting (with the account
-/// selected again) is the cure.
+/// on the Meta side. Flagged `needs_reauth`; a connect naming it by
+/// `social_account_uid` is the cure.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.social_account"))]
 pub struct RemovedAccess {

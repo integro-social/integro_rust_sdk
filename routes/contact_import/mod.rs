@@ -131,7 +131,7 @@ pub async fn update_row(__client: &crate::runtime::Client, import_uid: &str, row
 /// gets a parse verdict, and the import is created `staged` — nothing touches
 /// a platform until `start`. Invalid rows stay editable while staged.
 ///
-/// Requires `ImportContacts` in the accounts' group; every account must be a whatsapp session account (stevo or native) of that same group.
+/// Requires `ImportContacts` in the accounts' group; every account must be a native whatsapp account of that same group.
 pub async fn upload(__client: &crate::runtime::Client, __form: reqwest::multipart::Form) -> crate::runtime::ApiResult<ContactImportDetail> {
   let mut __path = String::from("/contact-import");
   __client.request_multipart(crate::runtime::Method::POST, &__path, None::<&()>, __form).await

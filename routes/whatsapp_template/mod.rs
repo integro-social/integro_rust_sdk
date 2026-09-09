@@ -23,7 +23,7 @@ pub async fn delete(__client: &crate::runtime::Client, __query: &DeleteTemplateQ
   __client.request(crate::runtime::Method::DELETE, &__path, Some(__query), None::<&()>).await
 }
 /// List the WABA's whatsapp message templates, all statuses (only APPROVED
-/// ones are sendable).
+/// ones are sendable); whatsapp and whatsapp_alt accounts alike.
 ///
 /// Requires `ViewTemplates` in the account's group.
 pub async fn list(__client: &crate::runtime::Client, __query: &ListTemplatesQuery) -> crate::runtime::ApiResult<Vec<TemplateResponse>> {

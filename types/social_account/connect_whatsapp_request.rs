@@ -11,4 +11,8 @@ pub struct ConnectWhatsappRequest {
   /// A permanent system user token holding `whatsapp_business_messaging` +
   /// `whatsapp_business_management`, generated once in Business Manager.
   pub access_token: String,
+  /// The group's official whatsapp account this provisioning reconnects, if
+  /// any: only its number is refreshed, the WABA's other numbers are left
+  /// alone.
+  pub social_account_uid: Option<Uid>,
 }

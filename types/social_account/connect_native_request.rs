@@ -6,4 +6,7 @@ use crate::types::primitives::uid::Uid;
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.social_account"))]
 pub struct ConnectNativeRequest {
   pub group_uid: Uid,
+  /// The group's native account to pair again, if any: the scan must be of
+  /// its number, and the new device replaces the one it had.
+  pub social_account_uid: Option<Uid>,
 }

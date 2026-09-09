@@ -16,7 +16,10 @@ pub enum ForwardRejection {
   /// The target's channel cannot express this content (a place on instagram, a
   /// carousel on whatsapp, a multi-card contact on a one-vcard gateway).
   UnsupportedContent,
-  /// Official whatsapp outside the 24h window — only a template lifts it.
+  /// Outside the channel's response window (`GET /channel`): free-form
+  /// content needs an inbound message within the window's hours, and past
+  /// that only what the window lifts by passes — a template on official and
+  /// alt whatsapp. The native flavor has no window.
   WindowExpired,
   /// The send could not be queued.
   Failed,

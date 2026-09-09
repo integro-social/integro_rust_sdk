@@ -12,8 +12,8 @@ pub struct UploadContactImportForm {
   /// keeps client filenames out of the stored part, so it rides as a field.
   pub filename: Text1_255,
   /// The accounts the load distributes over, comma-separated uids. Every one
-  /// must be a whatsapp session account (stevo or native) of one same group,
-  /// which becomes the import's group.
+  /// must be a native whatsapp account of one same group, which becomes the
+  /// import's group.
   pub social_account_uids: String,
   /// 0-based index of the phone column in the header row.
   pub phone_column: String,

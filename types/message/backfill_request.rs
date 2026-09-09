@@ -2,9 +2,10 @@
 #![allow(unused_imports, non_snake_case, non_camel_case_types, clippy::all)]
 use crate::types::message::meta_backfill::MetaBackfill;
 
-/// Channel-tagged backfill request — Meta's Conversations API covers the
-/// page-backed inboxes only, so no other channel's shape deserializes. The
-/// `channel` must match the named account's.
+/// Channel-tagged backfill request — only the page-backed inboxes expose
+/// history (Meta's Conversations API natively, the gateway's replayed
+/// history on the alt channels), so no other channel's shape deserializes.
+/// The `channel` must match the named account's.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.message"))]
 #[serde(tag = "channel")]

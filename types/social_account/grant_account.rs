@@ -10,10 +10,8 @@ pub struct GrantAccount {
   pub external_id: String,
   pub name: String,
   pub username: Option<String>,
-  /// Already registered in the target group — confirming it refreshes the
-  /// stored token and display fields.
-  pub connected: bool,
-  /// Registered in another group: shown locked, never selectable (accounts
-  /// cannot be moved between groups by a connect).
-  pub other_group: bool,
+  /// How many accounts of this identity the target group already holds;
+  /// confirming adds another, independent one, unless the login named the
+  /// account it reconnects.
+  pub connections: u32,
 }

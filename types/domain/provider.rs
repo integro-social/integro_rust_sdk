@@ -17,10 +17,14 @@ pub enum Provider {
   Instagram,
   /// WhatsApp Business Platform (official Meta Cloud API).
   Whatsapp,
-  /// WhatsApp via a StevoManager v2 instance (unofficial gateway).
-  WhatsappStevo,
   /// WhatsApp via an in-process whatsmeow linked-device session (unofficial).
   WhatsappNative,
+  /// Facebook through the alternate gateway; see [`Channel::FacebookAlt`].
+  FacebookAlt,
+  /// Instagram through the alternate gateway; see [`Channel::InstagramAlt`].
+  InstagramAlt,
+  /// WhatsApp through the alternate gateway; see [`Channel::WhatsappAlt`].
+  WhatsappAlt,
   /// A Google account (per-account OAuth). Which surfaces it reaches —
   /// calendar today, business profile ahead — is decided by the scopes the
   /// grant carries, not by the provider.

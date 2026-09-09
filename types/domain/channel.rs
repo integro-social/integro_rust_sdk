@@ -3,7 +3,9 @@
 
 /// The social platforms the hub speaks. Every channel-scoped payload —
 /// messages, posts, accounts — is distinguished by this identifier so
-/// consumers integrate one API shape across platforms.
+/// consumers integrate one API shape across platforms. A channel is a
+/// [`ChannelFamily`] (what the contact sees and what the platform allows)
+/// reached through a [`Transport`] (how the hub speaks to it).
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.domain"))]
 #[serde(rename_all = "snake_case")]
@@ -12,12 +14,20 @@ pub enum Channel {
   Instagram,
   /// WhatsApp Business Platform (official Meta Cloud API).
   Whatsapp,
-  /// WhatsApp via a StevoManager v2 instance (unofficial gateway pairing a
-  /// regular WhatsApp account). Same conversation/message surface as
-  /// [`Channel::Whatsapp`]; no 24h window, no templates.
-  WhatsappStevo,
   /// WhatsApp via an in-process whatsmeow linked-device session (unofficial,
   /// pairs a regular WhatsApp account). Same conversation/message surface as
-  /// [`Channel::WhatsappStevo`]; no 24h window, no templates.
+  /// [`Channel::Whatsapp`]; no 24h window, no templates.
   WhatsappNative,
+  /// Facebook through the hub's alternate gateway, used while the hub's own
+  /// Meta app awaits review. Same rules as [`Channel::Facebook`]; an account
+  /// connected here and one connected officially are two accounts, each with
+  /// its own conversations.
+  FacebookAlt,
+  /// Instagram through the alternate gateway; same rules as
+  /// [`Channel::Instagram`], independent like [`Channel::FacebookAlt`].
+  InstagramAlt,
+  /// WhatsApp Business Platform through the alternate gateway: official Cloud
+  /// API rules (24h window, templates), independent like
+  /// [`Channel::FacebookAlt`].
+  WhatsappAlt,
 }

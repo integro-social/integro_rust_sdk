@@ -2,7 +2,6 @@
 #![allow(unused_imports, non_snake_case, non_camel_case_types, clippy::all)]
 use crate::types::domain::messenger_send::MessengerSend;
 use crate::types::domain::native_send::NativeSend;
-use crate::types::domain::stevo_send::StevoSend;
 use crate::types::domain::whatsapp_send::WhatsappSend;
 
 /// Channel-tagged send payload: each variant carries exactly the fields and
@@ -17,6 +16,11 @@ pub enum SendContent {
   Facebook(MessengerSend),
   Instagram(MessengerSend),
   Whatsapp(WhatsappSend),
-  WhatsappStevo(StevoSend),
   WhatsappNative(NativeSend),
+  /// The Messenger payload, carried by the alternate gateway.
+  FacebookAlt(MessengerSend),
+  /// The Instagram payload, carried by the alternate gateway.
+  InstagramAlt(MessengerSend),
+  /// The official WhatsApp payload, carried by the alternate gateway.
+  WhatsappAlt(WhatsappSend),
 }
