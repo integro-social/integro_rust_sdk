@@ -6,6 +6,7 @@ use crate::types::group::group_query::GroupQuery;
 use crate::types::group::group_response::GroupResponse;
 use crate::types::group::set_group_enabled_request::SetGroupEnabledRequest;
 use crate::types::group::set_group_logo_form::SetGroupLogoForm;
+use crate::types::group::set_group_logo_response::SetGroupLogoResponse;
 use crate::types::group::update_group_request::UpdateGroupRequest;
 
 /// Count groups.
@@ -38,14 +39,6 @@ pub async fn get(__client: &crate::runtime::Client, group_uid: &str, __query: &G
   __path = __path.replace("{group_uid}", &crate::runtime::encode_path(group_uid));
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
-/// Serve a group's logo image.
-///
-/// Requires `ViewGroups` in the group itself.
-pub async fn get_logo(__client: &crate::runtime::Client, group_uid: &str) -> crate::runtime::ApiResult<Vec<u8>> {
-  let mut __path = String::from("/group/{group_uid}/logo");
-  __path = __path.replace("{group_uid}", &crate::runtime::encode_path(group_uid));
-  __client.request_bytes(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
-}
 /// List groups, optionally enriched with per-group counts.
 ///
 /// Requires `ViewGroups`; the list covers only groups where the caller holds it, and each count is filled only for those where it also holds that count's own permission — `ViewApiKeys` for `api_key_count`, `ViewMembers` for `member_count`, `ViewSocialAccounts` for `social_account_count` — `null` everywhere else.
@@ -69,10 +62,12 @@ pub async fn set_enabled(__client: &crate::runtime::Client, group_uid: &str, __b
   __path = __path.replace("{group_uid}", &crate::runtime::encode_path(group_uid));
   __client.request(crate::runtime::Method::PUT, &__path, None::<&()>, Some(__body)).await
 }
-/// Upload or replace a group's logo image.
+/// Upload or replace a group's logo image; the stored media's uid lands on
+/// `Group.logo_uid`, served by `media.serve` to anyone holding `ViewGroups`
+/// in the group.
 ///
 /// Requires `UpdateGroups` in the group itself, and is rejected when the caller trips the per-user file-upload throttle.
-pub async fn set_logo(__client: &crate::runtime::Client, group_uid: &str, __form: reqwest::multipart::Form) -> crate::runtime::ApiResult<()> {
+pub async fn set_logo(__client: &crate::runtime::Client, group_uid: &str, __form: reqwest::multipart::Form) -> crate::runtime::ApiResult<SetGroupLogoResponse> {
   let mut __path = String::from("/group/{group_uid}/logo");
   __path = __path.replace("{group_uid}", &crate::runtime::encode_path(group_uid));
   __client.request_multipart(crate::runtime::Method::POST, &__path, None::<&()>, __form).await

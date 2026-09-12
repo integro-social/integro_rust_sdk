@@ -3,10 +3,8 @@
 use crate::types::primitives::uid::Uid;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-#[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.domain"))]
-pub struct IssueScreenshot {
-  pub uid: Uid,
-  pub filename: String,
-  pub content_type: String,
-  pub size: u64,
+#[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.group"))]
+pub struct SetGroupLogoResponse {
+  /// The stored logo, now `Group.logo_uid`.
+  pub logo_uid: Uid,
 }

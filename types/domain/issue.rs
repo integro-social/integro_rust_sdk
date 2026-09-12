@@ -2,7 +2,6 @@
 #![allow(unused_imports, non_snake_case, non_camel_case_types, clippy::all)]
 use crate::types::domain::issue_category::IssueCategory;
 use crate::types::domain::issue_details::IssueDetails;
-use crate::types::domain::issue_screenshots::IssueScreenshots;
 use crate::types::domain::issue_severity::IssueSeverity;
 use crate::types::domain::issue_status::IssueStatus;
 use crate::types::primitives::text0_8000::Text0_8000;
@@ -19,7 +18,8 @@ pub struct Issue {
   pub status: IssueStatus,
   pub description: Text0_8000,
   pub details: IssueDetails,
-  pub screenshots: IssueScreenshots,
+  /// The screenshots attached at report time, as hosted media.
+  pub screenshots: Vec<Uid>,
   pub reported_by: Uid,
   pub created_at: Timestamp,
   pub updated_at: Timestamp,

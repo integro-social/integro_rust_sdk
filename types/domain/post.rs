@@ -19,6 +19,8 @@ pub struct Post {
   pub container_id: Option<String>,
   /// Carousel child containers (comma-separated) still processing.
   pub container_children: Option<String>,
+  /// The alternate gateway's id for the post, once it accepted it.
+  pub gateway_post_id: Option<String>,
   pub external_id: Option<String>,
   pub permalink: Option<String>,
   pub created_by: Option<Uid>,

@@ -12,8 +12,9 @@ pub struct UserInviteDetailResponse {
   pub email: Email,
   pub group_uid: Uid,
   pub group_name: Name,
-  /// Whether `userInvite.logo` has an image to serve for this group.
-  pub has_logo: bool,
+  /// The group's logo at a signed address the invited account may fetch
+  /// before it holds `ViewGroups`; valid for 30 minutes from this answer.
+  pub logo_url: Option<String>,
   pub role: MembershipRole,
   pub invited_by_name: Name,
   pub expires_at: Timestamp,

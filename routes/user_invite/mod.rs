@@ -49,13 +49,6 @@ pub async fn list(__client: &crate::runtime::Client) -> crate::runtime::ApiResul
   let mut __path = String::from("/user-invite");
   __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
 }
-/// Serve the invited group's logo image.
-///
-/// Authenticated, and only for the account the invitation was addressed to; the invitation stands in for the `ViewGroups` the recipient does not hold yet. A POST because the token is a credential, not because it writes.
-pub async fn logo(__client: &crate::runtime::Client, __body: &UserInviteTokenRequest) -> crate::runtime::ApiResult<Vec<u8>> {
-  let mut __path = String::from("/user-invite/logo");
-  __client.request_bytes(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
-}
 /// Resolve an invitation link to the address it was sent to and whether
 /// accepting it means creating an account.
 ///

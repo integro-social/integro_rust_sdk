@@ -10,7 +10,8 @@ pub struct Group {
   pub uid: Uid,
   pub name: Name,
   pub enabled: bool,
-  pub logo_content_type: Option<String>,
+  /// The group's logo, a hosted media; `null` when the group has none.
+  pub logo_uid: Option<Uid>,
   pub created_at: Timestamp,
   pub updated_at: Timestamp,
 }

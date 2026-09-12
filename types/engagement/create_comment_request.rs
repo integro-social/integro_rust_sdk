@@ -2,9 +2,9 @@
 #![allow(unused_imports, non_snake_case, non_camel_case_types, clippy::all)]
 use crate::types::engagement::comment_create::CommentCreate;
 
-/// Channel-tagged top-level comment: only facebook and instagram carry a
-/// comment surface, so no other channel's shape deserializes. The `channel`
-/// must match the account's.
+/// Channel-tagged top-level comment: only facebook and instagram, official
+/// or through the alternate gateway, carry a comment surface, so no other
+/// channel's shape deserializes. The `channel` must match the account's.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.engagement"))]
 #[serde(tag = "channel")]
@@ -12,4 +12,8 @@ use crate::types::engagement::comment_create::CommentCreate;
 pub enum CreateCommentRequest {
   Facebook(CommentCreate),
   Instagram(CommentCreate),
+  /// The Facebook comment, carried by the alternate gateway.
+  FacebookAlt(CommentCreate),
+  /// The Instagram comment, carried by the alternate gateway.
+  InstagramAlt(CommentCreate),
 }

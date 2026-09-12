@@ -28,6 +28,7 @@ pub mod pulse_sys;
 pub mod rate_limit;
 pub mod search;
 pub mod social_account;
+pub mod transport;
 pub mod uptime;
 pub mod user;
 pub mod user_invite;

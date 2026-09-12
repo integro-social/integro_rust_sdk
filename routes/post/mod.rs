@@ -21,8 +21,9 @@ pub async fn create(__client: &crate::runtime::Client, __body: &CreatePostReques
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
 }
 /// Delete a post: published posts are removed from the platform (Instagram
-/// carousels are deleted as a whole). A scheduled or pending post is
-/// cancelled hub-side — it is never published, and its unpublished Instagram
+/// carousels are deleted as a whole); a published instagram_alt post cannot
+/// be removed through the alternate gateway and is refused (400). A
+/// scheduled or pending post is cancelled hub-side — it is never published, and its unpublished Instagram
 /// container is left to expire on Meta's side rather than deleted. The row is
 /// kept with a `deleted` status.
 ///

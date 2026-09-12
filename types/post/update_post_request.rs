@@ -14,4 +14,10 @@ pub enum UpdatePostRequest {
     /// stories carry no text.
     message: String,
   },
+  /// The Facebook edit, carried by the alternate gateway.
+  FacebookAlt {
+    /// The new text: `message` on page posts, `description` on videos/reels;
+    /// stories carry no text.
+    message: String,
+  },
 }

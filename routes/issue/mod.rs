@@ -12,7 +12,7 @@ pub async fn count(__client: &crate::runtime::Client) -> crate::runtime::ApiResu
   let mut __path = String::from("/issue/count");
   __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
 }
-/// Report a new issue (severity, description, details, and 1–10 screenshots) recorded under the caller's own user.
+/// Report a new issue (severity, description, details, and 1–10 screenshots) recorded under the caller's own user. The screenshots become hosted media named by `Issue.screenshots`, served by `media.serve` to platform staff holding `ViewIssues`.
 ///
 /// Any authenticated user. Rejected when the platform is at its open-issue cap, and — when screenshots are attached — when the caller trips the per-user file-upload throttle.
 pub async fn create(__client: &crate::runtime::Client, __form: reqwest::multipart::Form) -> crate::runtime::ApiResult<CreateIssueResponse> {
@@ -33,15 +33,6 @@ pub async fn get(__client: &crate::runtime::Client, issue_uid: &str) -> crate::r
 pub async fn list(__client: &crate::runtime::Client) -> crate::runtime::ApiResult<Vec<Issue>> {
   let mut __path = String::from("/issue");
   __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
-}
-/// Serve a screenshot file attached to an issue.
-///
-/// Requires `ViewIssues`, which only platform staff hold.
-pub async fn screenshot(__client: &crate::runtime::Client, issue_uid: &str, screenshot_uid: &str) -> crate::runtime::ApiResult<Vec<u8>> {
-  let mut __path = String::from("/issue/{issue_uid}/screenshot/{screenshot_uid}");
-  __path = __path.replace("{issue_uid}", &crate::runtime::encode_path(issue_uid));
-  __path = __path.replace("{screenshot_uid}", &crate::runtime::encode_path(screenshot_uid));
-  __client.request_bytes(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
 }
 /// Update the status of an issue.
 ///

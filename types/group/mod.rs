@@ -7,5 +7,6 @@ pub mod group_query;
 pub mod group_response;
 pub mod set_group_enabled_request;
 pub mod set_group_logo_form;
+pub mod set_group_logo_response;
 pub mod set_group_member_role_request;
 pub mod update_group_request;

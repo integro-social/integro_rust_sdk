@@ -2,6 +2,7 @@
 #![allow(unused_imports, unused_mut, clippy::all)]
 use crate::types::media::create_upload_url_request::CreateUploadUrlRequest;
 use crate::types::media::create_upload_url_response::CreateUploadUrlResponse;
+use crate::types::media::media_grant_query::MediaGrantQuery;
 use crate::types::media::upload_media_form::UploadMediaForm;
 use crate::types::media::upload_media_response::UploadMediaResponse;
 
@@ -10,7 +11,7 @@ use crate::types::media::upload_media_response::UploadMediaResponse;
 /// form. The URL carries its own unguessable token, needs no credential, and
 /// expires 15 minutes after this call; the first upload consumes it whether
 /// or not the bytes are accepted, and the upload answers with the stored
-/// media and its public URL.
+/// media's uid.
 ///
 /// Requires `UploadMedia` in the target group; group-scoped API keys upload into their own group, others must name it. A human caller is additionally rejected when they trip the per-user file-upload throttle.
 pub async fn create_upload_url(__client: &crate::runtime::Client, __body: &CreateUploadUrlRequest) -> crate::runtime::ApiResult<CreateUploadUrlResponse> {
@@ -18,22 +19,21 @@ pub async fn create_upload_url(__client: &crate::runtime::Client, __body: &Creat
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
 }
 /// Serve a hub-hosted media file. The uid may carry a cosmetic extension
-/// suffix (`{uid}.m4a`) — generated URLs include one as a format signal for
-/// external fetchers; it is stripped before lookup. A uid nothing names any
-/// more answers 404: the file went with its last referrer.
+/// suffix (`{uid}.m4a`), stripped before lookup. A uid nothing names any more
+/// answers 404: the file went with its last referrer.
 ///
-/// Public — no authentication required; the unguessable uid is the capability.
-pub async fn serve(__client: &crate::runtime::Client, media_uid: &str) -> crate::runtime::ApiResult<Vec<u8>> {
+/// A session cookie, a bearer session token or an API key: served when the caller may see something that names the file — `ViewMessages` in the group for a message attachment or a conversation avatar, `ViewPosts` for a post, `ViewCampaigns` for a template, `ViewSocialAccounts` for an account avatar, `ViewGroups` for a group logo, platform `ViewIssues` for a screenshot — or when the caller uploaded it from a session within the last 24 hours and nothing names it yet. A signed grant (`exp`, `sig`) minted by the hub for a platform fetch serves without a credential until it expires. Anything else answers 404, indistinguishable from an unknown uid.
+pub async fn serve(__client: &crate::runtime::Client, media_uid: &str, __query: &MediaGrantQuery) -> crate::runtime::ApiResult<Vec<u8>> {
   let mut __path = String::from("/media/{media_uid}");
   __path = __path.replace("{media_uid}", &crate::runtime::encode_path(media_uid));
-  __client.request_bytes(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
+  __client.request_bytes(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
-/// Upload a media file to the hub; the returned public URL can be used in any
-/// message or post payload (Meta fetches it from the hub). Bytes the hub
-/// already holds come back as the existing file — same uid, same URL. The
-/// URL stays valid while a message, post or campaign template names it, and
-/// for 24 hours after this upload otherwise; a third party handed the URL
-/// copies what it needs while it resolves.
+/// Upload a media file to the hub; the returned uid names it in any message,
+/// post or template payload as `{"kind":"hosted","uid":…}`. Bytes the hub
+/// already holds come back as the existing file — same uid. The file stays
+/// while a message, post, template, avatar, logo or issue names it, and for 24
+/// hours after this upload otherwise; until it is attached, only the uploader
+/// can fetch it.
 ///
 /// Requires `UploadMedia` in the target group; group-scoped API keys upload into their own group, others must name it. A human caller is additionally rejected when they trip the per-user file-upload throttle.
 pub async fn upload(__client: &crate::runtime::Client, __form: reqwest::multipart::Form) -> crate::runtime::ApiResult<UploadMediaResponse> {
@@ -45,8 +45,8 @@ pub async fn upload(__client: &crate::runtime::Client, __form: reqwest::multipar
 /// themselves override, and the ticket supplies the filename. The ticket is
 /// consumed by this call whether or not the bytes are accepted — an empty
 /// body, or one past 100 MiB, is refused and the client asks for a new
-/// ticket. The reply is the stored media, whose public URL can be used in any
-/// message or post payload.
+/// ticket. The reply is the stored media, whose uid names it in any message
+/// or post payload.
 ///
 /// Public — no authentication; the unguessable ticket token is the capability, issued by `media.createUploadUrl` and valid for 15 minutes.
 pub async fn upload_with_ticket(__client: &crate::runtime::Client, token: &str) -> crate::runtime::ApiResult<UploadMediaResponse> {

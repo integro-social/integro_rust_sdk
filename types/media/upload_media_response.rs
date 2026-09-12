@@ -6,10 +6,9 @@ use crate::types::primitives::uid::Uid;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.media"))]
 pub struct UploadMediaResponse {
+  /// Names the file everywhere a media is attached: `{"kind":"hosted","uid":…}`
+  /// in a message, a post or a template. Served at `media.serve`.
   pub uid: Uid,
-  /// Public URL Meta (and CRMs) can fetch — usable anywhere the send/publish
-  /// APIs take a media URL.
-  pub url: String,
   pub kind: MediaKind,
   pub content_type: String,
   pub size: u64,

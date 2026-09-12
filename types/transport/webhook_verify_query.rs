@@ -2,7 +2,7 @@
 #![allow(unused_imports, non_snake_case, non_camel_case_types, clippy::all)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-#[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.message"))]
+#[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.transport"))]
 pub struct WebhookVerifyQuery {
   #[serde(rename = "hub.mode")]
   pub mode: Option<String>,

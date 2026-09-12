@@ -10,8 +10,9 @@ use crate::types::engagement::set_comment_hidden_request::SetCommentHiddenReques
 
 /// Comment on a post/media as the account named in the path (top-level
 /// comment). The payload is channel-tagged and must match the account's
-/// channel — only facebook and instagram carry a comment surface, so no
-/// other channel's shape deserializes.
+/// channel — only facebook and instagram, official or through the alternate
+/// gateway, carry a comment surface, so no other channel's shape
+/// deserializes.
 ///
 /// Requires `ReplyComments` in the account's group.
 pub async fn create(__client: &crate::runtime::Client, social_account_uid: &str, __body: &CreateCommentRequest) -> crate::runtime::ApiResult<Comment> {
@@ -38,8 +39,8 @@ pub async fn get(__client: &crate::runtime::Client, social_account_uid: &str, co
   __path = __path.replace("{comment_uid}", &crate::runtime::encode_path(comment_uid));
   __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
 }
-/// Like a comment as the page (Facebook only — Instagram's API has no
-/// comment likes).
+/// Like a comment as the page (Facebook only, official or through the
+/// alternate gateway — Instagram's API has no comment likes).
 ///
 /// Requires `ReplyComments` in the account's group.
 pub async fn like(__client: &crate::runtime::Client, social_account_uid: &str, comment_uid: &str) -> crate::runtime::ApiResult<()> {
