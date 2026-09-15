@@ -13,7 +13,7 @@ use crate::types::validate::{check, check_all, Constraint, Preprocess, Validatio
 #[serde(transparent)]
 pub struct Text0_8000(String);
 
-const SPEC: ValidationSpec = ValidationSpec { preprocess: Preprocess::Trim, constraints: &[Constraint::MinLen(0), Constraint::MaxLen(8000)] };
+const SPEC: ValidationSpec = ValidationSpec { preprocess: &[Preprocess::Trim], constraints: &[Constraint::MinLen(0), Constraint::MaxLen(8000)] };
 
 impl Text0_8000 {
   /// The only producer: validates input, returns the value or the first violation.
@@ -46,7 +46,7 @@ impl std::fmt::Display for Text0_8000 {
 }
 
 #[cfg(feature = "tapir")]
-static TAPIR_SPEC: tapir::validation::ValidationSpec = tapir::validation::ValidationSpec { preprocess: tapir::validation::Preprocess::Trim, constraints: &[tapir::validation::Constraint::MinLen(0), tapir::validation::Constraint::MaxLen(8000)] };
+static TAPIR_SPEC: tapir::validation::ValidationSpec = tapir::validation::ValidationSpec { preprocess: &[tapir::validation::Preprocess::Trim], constraints: &[tapir::validation::Constraint::MinLen(0), tapir::validation::Constraint::MaxLen(8000)] };
 
 #[cfg(feature = "tapir")]
 impl tapir::validation::Validated for Text0_8000 {

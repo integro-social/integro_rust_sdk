@@ -10,7 +10,7 @@ pub struct Phone(String);
 
 static SPEC_REGEX_0: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| regex::Regex::new("^\\+[1-9]\\d{6,14}$").unwrap());
 
-const SPEC: ValidationSpec = ValidationSpec { preprocess: Preprocess::Trim, constraints: &[Constraint::MinDigits(7), Constraint::MaxDigits(15), Constraint::Regex { source: "^\\+[1-9]\\d{6,14}$", compiled: || &SPEC_REGEX_0, hint: Some("esperado E.164: +<código do país><número>") }] };
+const SPEC: ValidationSpec = ValidationSpec { preprocess: &[Preprocess::Trim], constraints: &[Constraint::MinDigits(7), Constraint::MaxDigits(15), Constraint::Regex { source: "^\\+[1-9]\\d{6,14}$", compiled: || &SPEC_REGEX_0, hint: Some("esperado E.164: +<código do país><número>") }] };
 
 impl Phone {
   /// The only producer: validates input, returns the value or the first violation.
@@ -46,7 +46,7 @@ impl std::fmt::Display for Phone {
 static TAPIR_REGEX_0: std::sync::LazyLock<tapir::regex::Regex> = std::sync::LazyLock::new(|| tapir::regex::Regex::new("^\\+[1-9]\\d{6,14}$").unwrap());
 
 #[cfg(feature = "tapir")]
-static TAPIR_SPEC: tapir::validation::ValidationSpec = tapir::validation::ValidationSpec { preprocess: tapir::validation::Preprocess::Trim, constraints: &[tapir::validation::Constraint::MinDigits(7), tapir::validation::Constraint::MaxDigits(15), tapir::validation::Constraint::Regex { source: "^\\+[1-9]\\d{6,14}$", compiled: || &TAPIR_REGEX_0, hint: Some("esperado E.164: +<código do país><número>") }] };
+static TAPIR_SPEC: tapir::validation::ValidationSpec = tapir::validation::ValidationSpec { preprocess: &[tapir::validation::Preprocess::Trim], constraints: &[tapir::validation::Constraint::MinDigits(7), tapir::validation::Constraint::MaxDigits(15), tapir::validation::Constraint::Regex { source: "^\\+[1-9]\\d{6,14}$", compiled: || &TAPIR_REGEX_0, hint: Some("esperado E.164: +<código do país><número>") }] };
 
 #[cfg(feature = "tapir")]
 impl tapir::validation::Validated for Phone {

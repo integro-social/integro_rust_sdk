@@ -3,8 +3,6 @@ pub mod comment_create;
 pub mod comment_message_request;
 pub mod create_comment_request;
 pub mod list_comments_query;
-pub mod list_mentions_query;
-pub mod mention_reply_request;
 pub mod private_reply_request;
 pub mod private_reply_response;
 pub mod set_comment_hidden_request;

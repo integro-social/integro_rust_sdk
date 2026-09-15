@@ -8,7 +8,7 @@ use crate::types::validate::{check, check_all, Constraint, Preprocess, Validatio
 #[serde(transparent)]
 pub struct Password8_128_F_F_T_F(String);
 
-const SPEC: ValidationSpec = ValidationSpec { preprocess: Preprocess::None, constraints: &[Constraint::MinLen(8), Constraint::MaxLen(128), Constraint::RequireDigit] };
+const SPEC: ValidationSpec = ValidationSpec { preprocess: &[], constraints: &[Constraint::MinLen(8), Constraint::MaxLen(128), Constraint::RequireDigit] };
 
 impl Password8_128_F_F_T_F {
   /// The only producer: validates input, returns the value or the first violation.
@@ -41,7 +41,7 @@ impl std::fmt::Display for Password8_128_F_F_T_F {
 }
 
 #[cfg(feature = "tapir")]
-static TAPIR_SPEC: tapir::validation::ValidationSpec = tapir::validation::ValidationSpec { preprocess: tapir::validation::Preprocess::None, constraints: &[tapir::validation::Constraint::MinLen(8), tapir::validation::Constraint::MaxLen(128), tapir::validation::Constraint::RequireDigit] };
+static TAPIR_SPEC: tapir::validation::ValidationSpec = tapir::validation::ValidationSpec { preprocess: &[], constraints: &[tapir::validation::Constraint::MinLen(8), tapir::validation::Constraint::MaxLen(128), tapir::validation::Constraint::RequireDigit] };
 
 #[cfg(feature = "tapir")]
 impl tapir::validation::Validated for Password8_128_F_F_T_F {

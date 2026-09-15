@@ -6,7 +6,7 @@ use crate::types::primitives::timestamp::Timestamp;
 /// One snapshot day's value. The newest day is usually still partial — the
 /// collector keeps re-capturing it until the UTC day rolls over.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-#[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.insight"))]
+#[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.domain"))]
 pub struct InsightPoint {
   /// UTC midnight of the snapshot day.
   pub captured_on: Timestamp,

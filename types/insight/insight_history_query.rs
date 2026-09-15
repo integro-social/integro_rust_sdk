@@ -5,10 +5,7 @@ use crate::types::primitives::timestamp::Timestamp;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.insight"))]
 pub struct InsightHistoryQuery {
-  /// Filter to these collected metric names (comma-separated); defaults to
-  /// every stored metric.
-  pub metrics: Option<String>,
   /// Inclusive range over snapshot days (unix ms); defaults to the last 30 days.
-  pub from: Option<Timestamp>,
-  pub to: Option<Timestamp>,
+  pub since: Option<Timestamp>,
+  pub until: Option<Timestamp>,
 }

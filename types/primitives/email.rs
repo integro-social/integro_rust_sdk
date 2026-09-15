@@ -10,7 +10,7 @@ pub struct Email(String);
 
 static SPEC_REGEX_0: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| regex::Regex::new("^[a-zA-Z0-9_%+-]+(\\.[a-zA-Z0-9_%+-]+)*@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*\\.[a-zA-Z]{2,}$").unwrap());
 
-const SPEC: ValidationSpec = ValidationSpec { preprocess: Preprocess::TrimLowercase, constraints: &[Constraint::MinLen(5), Constraint::MaxLen(254), Constraint::Regex { source: "^[a-zA-Z0-9_%+-]+(\\.[a-zA-Z0-9_%+-]+)*@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*\\.[a-zA-Z]{2,}$", compiled: || &SPEC_REGEX_0, hint: None }] };
+const SPEC: ValidationSpec = ValidationSpec { preprocess: &[Preprocess::Trim, Preprocess::Lowercase], constraints: &[Constraint::MinLen(5), Constraint::MaxLen(254), Constraint::Regex { source: "^[a-zA-Z0-9_%+-]+(\\.[a-zA-Z0-9_%+-]+)*@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*\\.[a-zA-Z]{2,}$", compiled: || &SPEC_REGEX_0, hint: None }] };
 
 impl Email {
   /// The only producer: validates input, returns the value or the first violation.
@@ -46,7 +46,7 @@ impl std::fmt::Display for Email {
 static TAPIR_REGEX_0: std::sync::LazyLock<tapir::regex::Regex> = std::sync::LazyLock::new(|| tapir::regex::Regex::new("^[a-zA-Z0-9_%+-]+(\\.[a-zA-Z0-9_%+-]+)*@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*\\.[a-zA-Z]{2,}$").unwrap());
 
 #[cfg(feature = "tapir")]
-static TAPIR_SPEC: tapir::validation::ValidationSpec = tapir::validation::ValidationSpec { preprocess: tapir::validation::Preprocess::TrimLowercase, constraints: &[tapir::validation::Constraint::MinLen(5), tapir::validation::Constraint::MaxLen(254), tapir::validation::Constraint::Regex { source: "^[a-zA-Z0-9_%+-]+(\\.[a-zA-Z0-9_%+-]+)*@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*\\.[a-zA-Z]{2,}$", compiled: || &TAPIR_REGEX_0, hint: None }] };
+static TAPIR_SPEC: tapir::validation::ValidationSpec = tapir::validation::ValidationSpec { preprocess: &[tapir::validation::Preprocess::Trim, tapir::validation::Preprocess::Lowercase], constraints: &[tapir::validation::Constraint::MinLen(5), tapir::validation::Constraint::MaxLen(254), tapir::validation::Constraint::Regex { source: "^[a-zA-Z0-9_%+-]+(\\.[a-zA-Z0-9_%+-]+)*@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*\\.[a-zA-Z]{2,}$", compiled: || &TAPIR_REGEX_0, hint: None }] };
 
 #[cfg(feature = "tapir")]
 impl tapir::validation::Validated for Email {

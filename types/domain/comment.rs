@@ -19,6 +19,11 @@ pub struct Comment {
   pub from_name: Option<String>,
   /// The account's own comments (our replies or comments made natively).
   pub from_account: bool,
+  /// The author's picture url on the platform, when it gave one; expires.
+  pub from_picture: Option<String>,
+  /// Whether the account liked it (Facebook only; the hub persists its own likes).
+  pub liked: bool,
+  pub like_count: i64,
   pub text: String,
   pub hidden: bool,
   pub deleted: bool,

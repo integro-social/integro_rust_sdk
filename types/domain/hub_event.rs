@@ -5,13 +5,13 @@ use crate::types::domain::call_phase::CallPhase;
 use crate::types::domain::channel::Channel;
 use crate::types::domain::comment::Comment;
 use crate::types::domain::conversation::Conversation;
-use crate::types::domain::mention::Mention;
 use crate::types::domain::message::Message;
 use crate::types::domain::post::Post;
 use crate::types::domain::presence_state::PresenceState;
 use crate::types::domain::reaction_action::ReactionAction;
 use crate::types::google::review::Review;
 use crate::types::domain::social_account::SocialAccount;
+use crate::types::domain::social_post::SocialPost;
 use crate::types::primitives::timestamp::Timestamp;
 use crate::types::primitives::uid::Uid;
 
@@ -155,11 +155,12 @@ pub enum HubEvent {
     comment_uid: Uid,
     external_id: String,
   },
-  MentionReceived {
+  /// A platform post's row changed: a sync filled it or a comment arrived.
+  SocialPostUpdated {
     group_uid: Uid,
     channel: Channel,
     social_account_uid: Uid,
-    mention: Mention,
+    post: SocialPost,
   },
   PostPublished {
     group_uid: Uid,

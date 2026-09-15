@@ -7,9 +7,9 @@
 
 #[derive(Clone, Copy)]
 pub enum Preprocess {
-  None,
   Trim,
-  TrimLowercase,
+  Lowercase,
+  Uppercase,
 }
 
 #[derive(Clone, Copy)]
@@ -37,7 +37,7 @@ pub enum Constraint {
 }
 
 pub struct ValidationSpec {
-  pub preprocess: Preprocess,
+  pub preprocess: &'static [Preprocess],
   pub constraints: &'static [Constraint],
 }
 
@@ -113,11 +113,14 @@ impl std::fmt::Display for Violation {
 impl std::error::Error for Violation {}
 
 fn normalize<'a>(spec: &ValidationSpec, value: &'a str) -> std::borrow::Cow<'a, str> {
-  match spec.preprocess {
-    Preprocess::None => std::borrow::Cow::Borrowed(value),
-    Preprocess::Trim => std::borrow::Cow::Borrowed(value.trim()),
-    Preprocess::TrimLowercase => std::borrow::Cow::Owned(value.trim().to_lowercase()),
-  }
+  spec.preprocess.iter().fold(std::borrow::Cow::Borrowed(value), |value, step| match step {
+    Preprocess::Trim => match value {
+      std::borrow::Cow::Borrowed(s) => std::borrow::Cow::Borrowed(s.trim()),
+      std::borrow::Cow::Owned(s) => std::borrow::Cow::Owned(s.trim().to_owned()),
+    },
+    Preprocess::Lowercase => std::borrow::Cow::Owned(value.to_ascii_lowercase()),
+    Preprocess::Uppercase => std::borrow::Cow::Owned(value.to_ascii_uppercase()),
+  })
 }
 
 fn check_one(c: &Constraint, value: Value) -> Option<Violation> {

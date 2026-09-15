@@ -13,6 +13,6 @@ pub struct RosterFilter {
   pub social_account_uids: Option<Vec<Uid>>,
   pub channels: Option<Vec<Channel>>,
   /// Event kinds and/or family aliases (`message`, `presence`, `comment`,
-  /// `mention`, `post`, `conversation`, `account`, `review`).
+  /// `post`, `conversation`, `account`, `review`).
   pub events: Option<Vec<String>>,
 }

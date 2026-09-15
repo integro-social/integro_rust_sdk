@@ -12,7 +12,7 @@ use crate::types::validate::{check, check_all, Constraint, Preprocess, Validatio
 #[serde(transparent)]
 pub struct Number1024_107374182400(i64);
 
-const SPEC: ValidationSpec = ValidationSpec { preprocess: Preprocess::None, constraints: &[Constraint::Min(1024), Constraint::Max(107374182400)] };
+const SPEC: ValidationSpec = ValidationSpec { preprocess: &[], constraints: &[Constraint::Min(1024), Constraint::Max(107374182400)] };
 
 impl Number1024_107374182400 {
   /// The only producer: validates input, returns the value or the first violation.
@@ -35,7 +35,7 @@ impl std::fmt::Display for Number1024_107374182400 {
 }
 
 #[cfg(feature = "tapir")]
-static TAPIR_SPEC: tapir::validation::ValidationSpec = tapir::validation::ValidationSpec { preprocess: tapir::validation::Preprocess::None, constraints: &[tapir::validation::Constraint::Min(1024), tapir::validation::Constraint::Max(107374182400)] };
+static TAPIR_SPEC: tapir::validation::ValidationSpec = tapir::validation::ValidationSpec { preprocess: &[], constraints: &[tapir::validation::Constraint::Min(1024), tapir::validation::Constraint::Max(107374182400)] };
 
 #[cfg(feature = "tapir")]
 impl tapir::validation::Validated for Number1024_107374182400 {

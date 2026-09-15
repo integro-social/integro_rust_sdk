@@ -8,7 +8,7 @@ use crate::types::validate::{check, check_all, Constraint, Preprocess, Validatio
 #[serde(transparent)]
 pub struct Pin6(String);
 
-const SPEC: ValidationSpec = ValidationSpec { preprocess: Preprocess::Trim, constraints: &[Constraint::ExactLen(6), Constraint::AsciiDigitsOnly] };
+const SPEC: ValidationSpec = ValidationSpec { preprocess: &[Preprocess::Trim], constraints: &[Constraint::ExactLen(6), Constraint::AsciiDigitsOnly] };
 
 impl Pin6 {
   /// The only producer: validates input, returns the value or the first violation.
@@ -41,7 +41,7 @@ impl std::fmt::Display for Pin6 {
 }
 
 #[cfg(feature = "tapir")]
-static TAPIR_SPEC: tapir::validation::ValidationSpec = tapir::validation::ValidationSpec { preprocess: tapir::validation::Preprocess::Trim, constraints: &[tapir::validation::Constraint::ExactLen(6), tapir::validation::Constraint::AsciiDigitsOnly] };
+static TAPIR_SPEC: tapir::validation::ValidationSpec = tapir::validation::ValidationSpec { preprocess: &[tapir::validation::Preprocess::Trim], constraints: &[tapir::validation::Constraint::ExactLen(6), tapir::validation::Constraint::AsciiDigitsOnly] };
 
 #[cfg(feature = "tapir")]
 impl tapir::validation::Validated for Pin6 {
