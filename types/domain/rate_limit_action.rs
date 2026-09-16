@@ -24,7 +24,4 @@ pub enum RateLimitAction {
   /// A manual re-read of one social account's name and picture from its
   /// platform; counted per account.
   ProfileRefresh,
-  /// A manual re-read of one social account's posts from its platform;
-  /// counted per account.
-  SocialPostSync,
 }

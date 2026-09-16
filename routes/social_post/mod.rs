@@ -4,6 +4,8 @@ use crate::types::insight::insight_history_query::InsightHistoryQuery;
 use crate::types::post::list_social_posts_query::ListSocialPostsQuery;
 use crate::types::domain::social_post::SocialPost;
 use crate::types::insight::social_post_insight_history::SocialPostInsightHistory;
+use crate::types::domain::social_post_summary::SocialPostSummary;
+use crate::types::post::social_post_summary_query::SocialPostSummaryQuery;
 
 /// Fetch one platform post by uid.
 ///
@@ -34,16 +36,12 @@ pub async fn list(__client: &crate::runtime::Client, __query: &ListSocialPostsQu
   let mut __path = String::from("/social-post");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
-/// Start a re-read of the account's posts from its platform in the background
-/// and answer at once: the 25 most recent plus every post with comments, their
-/// thumbnails and, for posts seen for the first time, their whole comment
-/// thread. Every post the sync touches emits `social_post_updated`. Allowed
-/// once per account every five minutes; the hub runs it by itself once when an
-/// account connects. Only facebook_alt and instagram_alt accounts can be synced.
+/// Totals over the platform posts in scope: how many there are, their
+/// comments and the ones still unanswered. The list's pages never add up to
+/// these; this does.
 ///
-/// Requires `ViewPosts` in the account's group; throttled to one call per account every five minutes.
-pub async fn sync(__client: &crate::runtime::Client, social_account_uid: &str) -> crate::runtime::ApiResult<()> {
-  let mut __path = String::from("/social-account/{social_account_uid}/social-post/sync");
-  __path = __path.replace("{social_account_uid}", &crate::runtime::encode_path(social_account_uid));
-  __client.request(crate::runtime::Method::POST, &__path, None::<&()>, None::<&()>).await
+/// Requires `ViewPosts`; counts only posts of groups where the caller holds it, narrowed by `group_uid` / `social_account_uid` when given.
+pub async fn summary(__client: &crate::runtime::Client, __query: &SocialPostSummaryQuery) -> crate::runtime::ApiResult<SocialPostSummary> {
+  let mut __path = String::from("/social-post/summary");
+  __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }

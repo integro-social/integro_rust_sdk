@@ -5,4 +5,5 @@ pub mod list_social_posts_query;
 pub mod set_post_comments_request;
 pub mod set_post_hidden_request;
 pub mod set_post_pinned_request;
+pub mod social_post_summary_query;
 pub mod update_post_request;

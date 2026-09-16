@@ -22,13 +22,21 @@ pub struct SocialPost {
   pub picture_source: Option<String>,
   pub permalink: Option<String>,
   pub published_at: Option<Timestamp>,
-  /// The platform's own count, refreshed by sync and bumped by the webhook.
+  /// The platform's own count or the comments the hub holds, whichever is
+  /// larger: the platform's count lags behind a comment the webhook delivered.
   pub comment_count: i64,
   pub like_count: i64,
   pub detail: SocialPostDetail,
+  /// When the gateway last described the post. `None` marks a post the hub
+  /// knows only through its comments: the listings never reached it.
   pub synced_at: Option<Timestamp>,
+  /// When the whole comment thread of such a post was read by post id.
+  pub thread_imported_at: Option<Timestamp>,
   pub insight_refreshed_at: Option<Timestamp>,
   pub insight_next_at: Option<Timestamp>,
+  /// When the gateway found the post gone from the platform; a deleted post
+  /// leaves the list and its metrics stop being read.
+  pub deleted_at: Option<Timestamp>,
   pub created_at: Timestamp,
   pub updated_at: Timestamp,
   pub unanswered_count: i64,
