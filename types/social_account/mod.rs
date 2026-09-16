@@ -22,6 +22,7 @@ pub mod session_status;
 pub mod set_social_account_alias_request;
 pub mod set_social_account_conversation_cap_request;
 pub mod set_social_account_enabled_request;
+pub mod set_social_account_group_request;
 pub mod set_social_account_presence_request;
 pub mod social_account_response;
 pub mod start_native_pairing_response;

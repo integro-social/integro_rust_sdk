@@ -21,7 +21,6 @@ pub mod password8_128__f__f__t__f;
 pub mod phone;
 pub mod pin6;
 pub mod text0_2048;
-pub mod text0_255;
 pub mod text0_50;
 pub mod text0_8000;
 pub mod text1_255;
