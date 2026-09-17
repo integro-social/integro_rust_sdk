@@ -40,6 +40,7 @@ pub mod user_mfa;
 pub mod user_notification;
 pub mod user_password_reset;
 pub mod user_session;
+pub mod version;
 pub mod webhook;
 pub mod whatsapp_template;
 

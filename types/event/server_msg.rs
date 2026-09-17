@@ -9,10 +9,13 @@ use crate::types::domain::hub_event::HubEvent;
 #[serde(rename_all = "snake_case")]
 pub enum ServerMsg {
   /// Handshake result: the stream identity resume cursors pair with. When a
-  /// requested cursor cannot be replayed, a `gap` frame follows.
+  /// requested cursor cannot be replayed, a `gap` frame follows. `version` is
+  /// the release the server runs: a client generated from another release is
+  /// outside its contract.
   Welcome {
     epoch: String,
     seq: u64,
+    version: String,
   },
   /// One event; `seq` is the resume cursor after processing it.
   Event {

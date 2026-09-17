@@ -3,7 +3,8 @@
 // The tapir Rust client runtime: a typed HTTP/SSE/WebSocket engine the generated
 // `client.rs` builds on. Async (tokio + reqwest); WebSocket via
 // tokio-tungstenite. Consumer crate needs: reqwest (json, stream), tokio,
-// tokio-tungstenite, futures-util, serde, serde_json, serde_qs.
+// tokio-tungstenite, futures-util, serde, serde_json, serde_qs, and under
+// `rustls-tls` also rustls and rustls-platform-verifier.
 #![allow(dead_code, unused_imports, clippy::all)]
 
 use std::sync::Arc;
@@ -444,14 +445,16 @@ impl Client {
     let stop_task = stop.clone();
     let wake_task = wake.clone();
 
-    let url = match ws_url(&self.host, path, query) {
-      Ok(url) => url,
-      // The query cannot be serialized, so there is no socket to open. Report it
-      // the way a failed handshake reports, and hand back a stopped connection
-      // rather than one that silently subscribes without its filter.
+    let prepared = ws_url(&self.host, path, query).map_err(|e| e.to_string()).and_then(|url| WsTls::new().map(|tls| (url, tls)));
+    let (url, tls) = match prepared {
+      Ok(prepared) => prepared,
+      // The query cannot be serialized, or the TLS setup cannot be built, so
+      // there is no socket to open. Report it the way a failed handshake
+      // reports, and hand back a stopped connection rather than one that
+      // silently subscribes without its filter.
       Err(e) => {
         if let Some(cb) = handlers.on_error.as_mut() {
-          cb(e.to_string());
+          cb(e);
         }
         if let Some(cb) = handlers.on_status.as_mut() {
           cb(WsStatus::Stopped);
@@ -494,7 +497,7 @@ impl Client {
             }
           }
         };
-        match tokio_tungstenite::connect_async(request).await {
+        match tls.connect(request).await {
           Ok((ws_stream, _)) => {
             failures = 0;
             emit_status(&mut handlers, WsStatus::Open);
@@ -589,6 +592,46 @@ impl Client {
     });
 
     WsConnection { tx, stop, wake, _send: std::marker::PhantomData }
+  }
+}
+
+/// How the WebSocket half reaches a `wss://` host. Under `rustls-tls` it is the
+/// REST half's choice, made explicitly: the provider the application installed,
+/// aws-lc-rs otherwise, verifying against the platform trust store. Tungstenite's
+/// own default asks rustls for the process-level provider, and rustls refuses
+/// to pick one in a process that links both of its providers — which the
+/// consumer's other dependencies decide, not this crate.
+struct WsTls {
+  #[cfg(feature = "rustls-tls")]
+  config: Arc<rustls::ClientConfig>,
+}
+
+impl WsTls {
+  #[cfg(feature = "rustls-tls")]
+  fn new() -> Result<Self, String> {
+    use rustls_platform_verifier::BuilderVerifierExt;
+    let provider = rustls::crypto::CryptoProvider::get_default().cloned().unwrap_or_else(|| Arc::new(rustls::crypto::aws_lc_rs::default_provider()));
+    let config = rustls::ClientConfig::builder_with_provider(provider)
+      .with_safe_default_protocol_versions()
+      .and_then(|builder| builder.with_platform_verifier())
+      .map_err(|e| e.to_string())?
+      .with_no_client_auth();
+    Ok(Self { config: Arc::new(config) })
+  }
+
+  #[cfg(not(feature = "rustls-tls"))]
+  fn new() -> Result<Self, String> {
+    Ok(Self {})
+  }
+
+  async fn connect(
+    &self,
+    request: tokio_tungstenite::tungstenite::handshake::client::Request,
+  ) -> Result<(tokio_tungstenite::WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>, tokio_tungstenite::tungstenite::handshake::client::Response), tokio_tungstenite::tungstenite::Error> {
+    #[cfg(feature = "rustls-tls")]
+    return tokio_tungstenite::connect_async_tls_with_config(request, None, false, Some(tokio_tungstenite::Connector::Rustls(self.config.clone()))).await;
+    #[cfg(not(feature = "rustls-tls"))]
+    return tokio_tungstenite::connect_async(request).await;
   }
 }
 

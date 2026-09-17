@@ -35,3 +35,4 @@ pub mod user_invite;
 pub mod user_mfa;
 pub mod user_password_reset;
 pub mod user_session;
+pub mod version;
