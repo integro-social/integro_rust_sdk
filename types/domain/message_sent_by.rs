@@ -3,8 +3,7 @@
 
 /// Who produced an outbound message row — the attribution consumers (CRMs)
 /// use to tell machine sends from human takeovers without correlation
-/// heuristics. `None` on inbound rows and on rows stored before the field
-/// existed.
+/// heuristics. `None` on inbound rows.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.domain"))]
 #[serde(rename_all = "snake_case")]

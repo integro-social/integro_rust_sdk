@@ -6,13 +6,16 @@ use crate::types::primitives::uid::Uid;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.message"))]
 pub struct ListMessagesQuery {
-  pub group_uid: Option<Uid>,
-  pub social_account_uid: Option<Uid>,
-  /// Poll cursor: only messages with `id` strictly greater are returned.
-  pub since_id: u64,
+  /// Narrow to these groups, each one the caller may see; omit for everything the caller may see.
+  pub group_uids: Option<Vec<Uid>>,
+  /// Narrow to these accounts, each one in scope; naming any account overrides the groups.
+  pub social_account_uids: Option<Vec<Uid>>,
+  /// Poll cursor: only messages with `id` strictly greater are returned;
+  /// omit for every message. Not combinable with `uids`.
+  pub since_id: Option<u64>,
   /// Exact messages to return (≤200), for resolving rows a client already
   /// holds by uid — the reply targets a loaded page quotes but does not
-  /// contain. Mutually exclusive with the poll cursor.
+  /// contain. Not combinable with `since_id`.
   pub uids: Option<Vec<Uid>>,
   pub limit: Option<Number1_500>,
 }

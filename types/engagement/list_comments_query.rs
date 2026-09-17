@@ -6,8 +6,10 @@ use crate::types::primitives::uid::Uid;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.engagement"))]
 pub struct ListCommentsQuery {
-  pub group_uid: Option<Uid>,
-  pub social_account_uid: Option<Uid>,
+  /// Narrow to these groups, each one the caller may see; omit for everything the caller may see.
+  pub group_uids: Option<Vec<Uid>>,
+  /// Narrow to these accounts, each one in scope; naming any account overrides the groups.
+  pub social_account_uids: Option<Vec<Uid>>,
   /// Filter to one post's comments (platform post/media id).
   pub external_post_id: Option<String>,
   /// Poll cursor: only comments with `id` strictly greater are returned.

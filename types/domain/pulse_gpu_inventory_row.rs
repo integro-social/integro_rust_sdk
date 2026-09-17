@@ -10,5 +10,4 @@ pub struct PulseGpuInventoryRow {
   pub vendor: String,
   pub vram_total_bytes: u64,
   pub power_limit_watts: f32,
-  pub removed: bool,
 }

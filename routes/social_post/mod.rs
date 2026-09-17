@@ -29,7 +29,7 @@ pub async fn insights_history(__client: &crate::runtime::Client, social_post_uid
 /// List the posts that stand on the platforms, newest first: every post the
 /// hub knows about an account, published through it or not, with the
 /// platform's comment and like counts and how many third-party comments the
-/// account has not answered. `before` pages backwards.
+/// account has not answered. `until` pages backwards.
 ///
 /// Requires `ViewPosts`; the list covers only posts of groups where the caller holds it.
 pub async fn list(__client: &crate::runtime::Client, __query: &ListSocialPostsQuery) -> crate::runtime::ApiResult<Vec<SocialPost>> {
@@ -40,7 +40,7 @@ pub async fn list(__client: &crate::runtime::Client, __query: &ListSocialPostsQu
 /// comments and the ones still unanswered. The list's pages never add up to
 /// these; this does.
 ///
-/// Requires `ViewPosts`; counts only posts of groups where the caller holds it, narrowed by `group_uid` / `social_account_uid` when given.
+/// Requires `ViewPosts`; counts only posts of groups where the caller holds it, narrowed by the named groups and accounts when given.
 pub async fn summary(__client: &crate::runtime::Client, __query: &SocialPostSummaryQuery) -> crate::runtime::ApiResult<SocialPostSummary> {
   let mut __path = String::from("/social-post/summary");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await

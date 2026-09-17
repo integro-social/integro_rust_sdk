@@ -12,7 +12,6 @@ pub struct Post {
   pub social_account_uid: Uid,
   pub content: PostContent,
   pub status: PostStatus,
-  pub error: Option<String>,
   /// Hub-side schedule instant for `scheduled` posts.
   pub scheduled_at: Option<Timestamp>,
   /// Instagram media container awaiting Meta-side processing.

@@ -82,7 +82,7 @@ pub async fn connect_whatsapp(__client: &crate::runtime::Client, __body: &Connec
   let mut __path = String::from("/social-account/whatsapp");
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
 }
-/// Count connected social accounts, optionally filtered by group.
+/// Count connected social accounts, optionally filtered by groups.
 ///
 /// Requires `ViewSocialAccounts`; the count covers only accounts of groups where the caller holds it.
 pub async fn count(__client: &crate::runtime::Client, __query: &ListSocialAccountsQuery) -> crate::runtime::ApiResult<u64> {
@@ -144,7 +144,7 @@ pub async fn insights_history(__client: &crate::runtime::Client, social_account_
   __path = __path.replace("{social_account_uid}", &crate::runtime::encode_path(social_account_uid));
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
-/// List connected social accounts, optionally filtered by group, each with the
+/// List connected social accounts, optionally filtered by groups, each with the
 /// live session status of its whatsapp session when applicable.
 ///
 /// Requires `ViewSocialAccounts`; the list covers only accounts of groups where the caller holds it.

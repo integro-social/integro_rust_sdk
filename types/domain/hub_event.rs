@@ -17,9 +17,9 @@ use crate::types::primitives::uid::Uid;
 
 /// Every event the hub emits, in the exact shape delivered to its outbound
 /// transports: the group webhook (as the POST body) and the WebSocket stream
-/// (as one frame). The `event` tag names the kind. Transient kinds
-/// (`is_transient`) reach the socket only — they never enter the replay ring
-/// the webhook batcher reads.
+/// (as one frame). The `event` tag names the kind ([`EventKind`]). The
+/// live-only kinds (the presence kinds) reach the socket only — they never
+/// enter the replay ring the webhook batcher reads.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.domain"))]
 #[serde(tag = "event")]
@@ -74,7 +74,6 @@ pub enum HubEvent {
     message_uid: Uid,
     reactor_id: String,
     action: ReactionAction,
-    reaction: Option<String>,
     emoji: Option<String>,
   },
   /// Outbound messages in the conversation sent up to `watermark` (ms) were
@@ -153,7 +152,6 @@ pub enum HubEvent {
     channel: Channel,
     social_account_uid: Uid,
     comment_uid: Uid,
-    external_id: String,
   },
   /// A platform post's row changed: a sync filled it or a comment arrived.
   SocialPostUpdated {

@@ -7,19 +7,19 @@ use crate::types::primitives::uid::Uid;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.post"))]
 pub struct ListSocialPostsQuery {
-  pub group_uid: Option<Uid>,
-  pub social_account_uid: Option<Uid>,
+  /// Narrow to these groups, each one the caller may see; omit for everything the caller may see.
+  pub group_uids: Option<Vec<Uid>>,
+  /// Narrow to these accounts, each one in scope; naming any account overrides the groups.
+  pub social_account_uids: Option<Vec<Uid>>,
   /// The platform post of one hub post.
   pub post_uid: Option<Uid>,
   /// Only posts with at least one third-party comment the account has not answered.
   pub unanswered_only: bool,
   /// Only posts published at or after this instant (ms).
   pub since: Option<Timestamp>,
-  /// Only posts published before this instant (ms).
+  /// Only posts published strictly before this instant (ms); also the page cursor.
   pub until: Option<Timestamp>,
   /// Caption search: a case-insensitive substring.
   pub q: Option<String>,
-  /// Page cursor: only posts published strictly before this instant (ms).
-  pub before: Option<Timestamp>,
   pub limit: Option<Number1_200>,
 }

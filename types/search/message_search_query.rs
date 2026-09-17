@@ -8,8 +8,10 @@ use crate::types::primitives::uid::Uid;
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.search"))]
 pub struct MessageSearchQuery {
   pub q: Text0_8000,
-  pub group_uid: Option<Uid>,
-  pub social_account_uid: Option<Uid>,
+  /// Narrow to these groups, each one the caller may see; omit for everything the caller may see.
+  pub group_uids: Option<Vec<Uid>>,
+  /// Narrow to these accounts, each one in scope; naming any account overrides the groups.
+  pub social_account_uids: Option<Vec<Uid>>,
   /// Search inside this conversation only.
   pub conversation_uid: Option<Uid>,
   /// Keyset cursor: only hits with `id` strictly smaller are returned.

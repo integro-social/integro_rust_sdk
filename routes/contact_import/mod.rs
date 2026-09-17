@@ -45,7 +45,7 @@ pub async fn get(__client: &crate::runtime::Client, import_uid: &str) -> crate::
   __path = __path.replace("{import_uid}", &crate::runtime::encode_path(import_uid));
   __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
 }
-/// List imports, newest first, optionally one group's.
+/// List imports, newest first, optionally only some groups'.
 ///
 /// Requires `ImportContacts`; the list covers only imports of groups where the caller holds it.
 pub async fn list(__client: &crate::runtime::Client, __query: &ListImportsQuery) -> crate::runtime::ApiResult<Vec<ContactImportDetail>> {

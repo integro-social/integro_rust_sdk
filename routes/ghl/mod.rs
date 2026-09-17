@@ -48,7 +48,7 @@ pub async fn link(__client: &crate::runtime::Client, ghl_location_uid: &str, __b
   __path = __path.replace("{ghl_location_uid}", &crate::runtime::encode_path(ghl_location_uid));
   __client.request(crate::runtime::Method::PUT, &__path, None::<&()>, Some(__body)).await
 }
-/// List the installed GoHighLevel locations, optionally filtered by group, each
+/// List the installed GoHighLevel locations, optionally filtered by groups, each
 /// carrying the whatsapp account it bridges (`target_account_uid`, null while
 /// unlinked) and whether its grant needs reconnecting.
 ///

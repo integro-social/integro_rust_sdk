@@ -35,8 +35,7 @@ pub struct Message {
   pub idempotency_key: Option<String>,
   /// Who produced this outbound row: a machine client through the api, a hub
   /// operator, or a platform echo (paired phone / whatsapp web / meta
-  /// business inbox, incl. history imports). `None` on inbound rows and rows
-  /// stored before the field existed.
+  /// business inbox, incl. history imports). `None` on inbound rows.
   pub sent_by: Option<MessageSentBy>,
   /// The api key / user uid behind `sent_by`, when it names one.
   pub sent_by_uid: Option<Uid>,

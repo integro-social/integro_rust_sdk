@@ -71,7 +71,7 @@ pub async fn get(__client: &crate::runtime::Client, campaign_uid: &str) -> crate
   __path = __path.replace("{campaign_uid}", &crate::runtime::encode_path(campaign_uid));
   __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
 }
-/// List campaigns, newest first, optionally one group's.
+/// List campaigns, newest first, optionally only some groups'.
 ///
 /// Requires `ViewCampaigns`; the list covers only campaigns of groups where the caller holds it.
 pub async fn list(__client: &crate::runtime::Client, __query: &ListCampaignsQuery) -> crate::runtime::ApiResult<Vec<CampaignDetail>> {

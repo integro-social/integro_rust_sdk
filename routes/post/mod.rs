@@ -37,7 +37,7 @@ pub async fn get(__client: &crate::runtime::Client, post_uid: &str) -> crate::ru
   __path = __path.replace("{post_uid}", &crate::runtime::encode_path(post_uid));
   __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
 }
-/// List posts, newest first, optionally filtered by group or social account.
+/// List posts, newest first, optionally filtered by groups or social accounts.
 ///
 /// Requires `ViewPosts`; the list covers only posts of groups where the caller holds it.
 pub async fn list(__client: &crate::runtime::Client, __query: &ListPostsQuery) -> crate::runtime::ApiResult<Vec<Post>> {

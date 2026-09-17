@@ -10,8 +10,8 @@ use crate::types::primitives::uid::Uid;
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.insight"))]
 pub struct InsightQueryRequest {
   pub subject: InsightQuerySubject,
-  /// Narrow to one group; omit for everything the caller may see.
-  pub group_uid: Option<Uid>,
+  /// Narrow to these groups, each one the caller may see; omit for everything the caller may see.
+  pub group_uids: Option<Vec<Uid>>,
   /// Narrow to these accounts; every one must belong to the declared channel.
   pub social_account_uids: Option<Vec<Uid>>,
   /// Inclusive range over snapshot days (unix ms); defaults to the last 30 days.

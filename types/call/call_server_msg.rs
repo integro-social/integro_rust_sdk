@@ -19,11 +19,11 @@ pub enum CallServerMsg {
   VideoState {
     active: bool,
     upgrade: bool,
-    orientation: i32,
   },
-  /// The peer's true camera rotation, in clockwise quarter turns, discovered
-  /// per-frame. Phones signal rotation instead of rotating pixels, so a
-  /// renderer that ignores this shows the caller sideways.
+  /// The peer's camera rotation, in clockwise quarter turns: the only rotation
+  /// signal. Discovered per-frame, and also sent when the peer's video
+  /// signalling names a turn. Phones signal rotation instead of rotating
+  /// pixels, so a renderer that ignores this shows the caller sideways.
   Orientation {
     orientation: i32,
   },

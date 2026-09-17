@@ -7,8 +7,7 @@
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.domain"))]
 pub struct MessageReaction {
   pub reactor_id: String,
-  /// Meta's reaction name (e.g. `love`).
-  pub reaction: Option<String>,
-  /// The unicode emoji, when Meta provides it.
+  /// The unicode emoji; a Meta reaction name (e.g. `love`) is stored as its
+  /// glyph. `None` when the platform sent neither a glyph nor a known name.
   pub emoji: Option<String>,
 }

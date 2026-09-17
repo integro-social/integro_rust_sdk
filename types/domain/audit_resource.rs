@@ -20,7 +20,6 @@ pub enum AuditResource {
   Post,
   Webhook,
   Comment,
-  Mention,
   Media,
   Template,
   Conversation,
@@ -30,5 +29,4 @@ pub enum AuditResource {
   GhlLocation,
   ContactImport,
   Campaign,
-  Unknown,
 }

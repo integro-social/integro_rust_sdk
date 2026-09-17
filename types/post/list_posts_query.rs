@@ -6,7 +6,9 @@ use crate::types::primitives::uid::Uid;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.post"))]
 pub struct ListPostsQuery {
-  pub group_uid: Option<Uid>,
-  pub social_account_uid: Option<Uid>,
+  /// Narrow to these groups, each one the caller may see; omit for everything the caller may see.
+  pub group_uids: Option<Vec<Uid>>,
+  /// Narrow to these accounts, each one in scope; naming any account overrides the groups.
+  pub social_account_uids: Option<Vec<Uid>>,
   pub limit: Option<Number1_200>,
 }

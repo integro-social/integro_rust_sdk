@@ -9,5 +9,4 @@ pub struct PulseDiskInventoryRow {
   pub mount_point: String,
   pub fs_type: String,
   pub total_bytes: u64,
-  pub removed: bool,
 }

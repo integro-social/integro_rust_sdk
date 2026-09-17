@@ -95,9 +95,10 @@ pub async fn forward(__client: &crate::runtime::Client, conversation_uid: &str, 
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
 }
 /// Poll the unified message feed across channels: messages with `id` greater
-/// than `since_id`, oldest first, optionally filtered by group or account.
+/// than `since_id`, oldest first, optionally filtered by groups or accounts.
 /// `uids` instead returns exactly those messages (≤200, order unspecified),
-/// for resolving rows the caller already holds by uid.
+/// for resolving rows the caller already holds by uid; not combinable with
+/// `since_id`.
 ///
 /// Requires `ViewMessages`; the feed covers only messages of groups where the caller holds it.
 pub async fn list(__client: &crate::runtime::Client, __query: &ListMessagesQuery) -> crate::runtime::ApiResult<Vec<MessageWithContext>> {

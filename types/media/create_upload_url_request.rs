@@ -8,5 +8,4 @@ pub struct CreateUploadUrlRequest {
   /// Required for users and platform keys; group-bound keys imply their group.
   pub group_uid: Option<Uid>,
   pub filename: Option<String>,
-  pub content_type: Option<String>,
 }

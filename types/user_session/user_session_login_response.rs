@@ -8,9 +8,6 @@ use crate::types::domain::user_mfa_kind::UserMfaKind;
 #[serde(tag = "outcome")]
 #[serde(rename_all = "snake_case")]
 pub enum UserSessionLoginResponse {
-  UserSession {
-    token: Uid,
-  },
   UserMfaRequired {
     mfa_token: Uid,
     factors: Vec<UserMfaKind>,

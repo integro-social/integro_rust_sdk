@@ -18,7 +18,6 @@ pub struct UserInvite {
   pub group_uid: Option<Uid>,
   pub role: Option<MembershipRole>,
   pub expires_at: Timestamp,
-  pub accepted_at: Option<Timestamp>,
   pub email_status: UserInviteEmailStatus,
   pub created_at: Timestamp,
 }

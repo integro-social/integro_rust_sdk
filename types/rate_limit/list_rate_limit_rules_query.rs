@@ -5,9 +5,9 @@ use crate::types::primitives::uid::Uid;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.rate_limit"))]
 pub struct ListRateLimitRulesQuery {
-  /// Narrow to the rules that reach one group: the shared buckets, the
-  /// global defaults and that group's override and own tiers. Without it, platform staff get every
-  /// rule and everyone else the rules reaching the groups where they may view
-  /// limits.
-  pub group_uid: Option<Uid>,
+  /// Narrow to the rules that reach these groups, each one the caller may see:
+  /// the shared buckets, the global defaults and those groups' override and
+  /// own tiers. Without it, platform staff get every rule and everyone else the
+  /// rules reaching the groups where they may view limits.
+  pub group_uids: Option<Vec<Uid>>,
 }

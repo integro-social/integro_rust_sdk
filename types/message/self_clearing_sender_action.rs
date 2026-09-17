@@ -4,7 +4,7 @@
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.message"))]
 #[serde(rename_all = "snake_case")]
-pub enum WhatsappSenderAction {
+pub enum SelfClearingSenderAction {
   MarkSeen,
   TypingOn,
 }

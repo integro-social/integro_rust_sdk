@@ -14,8 +14,7 @@ pub async fn create(__client: &crate::runtime::Client, __body: &CreateTemplateRe
   let mut __path = String::from("/whatsapp/template");
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
 }
-/// Delete a whatsapp message template by name (all languages, or one specific
-/// `hsm_id`).
+/// Delete a whatsapp message template by name, every language of it.
 ///
 /// Requires `ManageTemplates` in the account's group.
 pub async fn delete(__client: &crate::runtime::Client, __query: &DeleteTemplateQuery) -> crate::runtime::ApiResult<()> {

@@ -19,7 +19,6 @@ pub struct SocialPost {
   pub caption: Option<String>,
   /// The hosted thumbnail (`media.serve`).
   pub picture_uid: Option<Uid>,
-  pub picture_source: Option<String>,
   pub permalink: Option<String>,
   pub published_at: Option<Timestamp>,
   /// The platform's own count or the comments the hub holds, whichever is

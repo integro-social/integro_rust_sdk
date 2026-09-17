@@ -12,6 +12,7 @@ pub mod connect_whatsapp_request;
 pub mod connect_whatsapp_response;
 pub mod exposure_query;
 pub mod grant_account;
+pub mod instagram_alt_target;
 pub mod list_social_accounts_query;
 pub mod native_pairing_status;
 pub mod native_pairing_status_response;

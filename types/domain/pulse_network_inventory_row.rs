@@ -11,5 +11,4 @@ pub struct PulseNetworkInventoryRow {
   pub ipv6_addresses: Vec<String>,
   pub link_speed_mbps: Option<u32>,
   pub is_physical: bool,
-  pub removed: bool,
 }

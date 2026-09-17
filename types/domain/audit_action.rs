@@ -32,5 +32,4 @@ pub enum AuditAction {
   SetMemberRole,
   RemoveMember,
   SetSuperAdmin,
-  Unknown,
 }

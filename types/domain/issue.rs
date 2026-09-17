@@ -11,7 +11,6 @@ use crate::types::primitives::uid::Uid;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.domain"))]
 pub struct Issue {
-  pub id: u64,
   pub uid: Uid,
   pub category: IssueCategory,
   pub severity: IssueSeverity,

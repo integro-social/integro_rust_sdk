@@ -17,7 +17,6 @@ pub struct GhlLocation {
   /// GHL's agency (company) id; empty when the grant does not carry one.
   pub company_id: String,
   pub name: String,
-  pub scope: Option<String>,
   /// The grant went stale (`invalid_grant` on refresh) and only a reconnect
   /// can revive it.
   pub needs_reauth: bool,

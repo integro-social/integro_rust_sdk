@@ -31,7 +31,6 @@ pub mod rate_limit;
 pub mod search;
 pub mod social_account;
 pub mod social_post;
-pub mod test;
 pub mod uptime;
 pub mod user;
 pub mod user_account_notification;

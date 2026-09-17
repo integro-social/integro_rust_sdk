@@ -10,7 +10,8 @@ use crate::types::primitives::uid::Uid;
 pub struct AuditLogQuery {
   #[serde(flatten)]
   pub window: AuditLogWindow,
-  pub group_uid: Option<Uid>,
+  /// Narrow to these groups, each one the caller may see; omit for everything the caller may see.
+  pub group_uids: Option<Vec<Uid>>,
   pub user_uid: Option<Uid>,
   pub action: Option<AuditAction>,
   pub resource: Option<AuditResource>,

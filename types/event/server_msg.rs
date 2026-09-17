@@ -8,13 +8,11 @@ use crate::types::domain::hub_event::HubEvent;
 #[serde(tag = "type")]
 #[serde(rename_all = "snake_case")]
 pub enum ServerMsg {
-  /// Handshake result: the stream identity resume cursors pair with.
-  /// `resumed` reports whether the requested cursor was replayed; when it is
-  /// false after a resume request, a `gap` frame follows.
+  /// Handshake result: the stream identity resume cursors pair with. When a
+  /// requested cursor cannot be replayed, a `gap` frame follows.
   Welcome {
     epoch: String,
     seq: u64,
-    resumed: bool,
   },
   /// One event; `seq` is the resume cursor after processing it.
   Event {

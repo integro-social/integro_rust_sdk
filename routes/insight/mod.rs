@@ -18,7 +18,7 @@ use crate::types::insight::posting_insight_response::PostingInsightResponse;
 /// message ever. Periods align to `utc_offset_minutes`; weeks start on
 /// Monday.
 ///
-/// Requires `ViewMessages`; covers only accounts of groups where the caller holds it, narrowed by `group_uid`, `social_account_uids` (each must be in scope) and `channels`. Hourly periods over at most 31 days, the others over at most 731 (400 beyond).
+/// Requires `ViewMessages`; covers only accounts of groups where the caller holds it, narrowed by `group_uids`, `social_account_uids` (each must be in scope) and `channels`. Hourly periods over at most 31 days, the others over at most 731 (400 beyond).
 pub async fn conversation(__client: &crate::runtime::Client, __body: &ConversationInsightQuery) -> crate::runtime::ApiResult<ConversationInsightResponse> {
   let mut __path = String::from("/insight/conversation");
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
@@ -27,7 +27,7 @@ pub async fn conversation(__client: &crate::runtime::Client, __body: &Conversati
 /// counted at their publication time; posts removed from the platform are
 /// left out. Periods align to `utc_offset_minutes`; weeks start on Monday.
 ///
-/// Requires `ViewPosts`; covers only accounts of groups where the caller holds it, narrowed by `group_uid`, `social_account_uids` (each must be in scope) and `channels`. Hourly periods over at most 31 days, the others over at most 731 (400 beyond).
+/// Requires `ViewPosts`; covers only accounts of groups where the caller holds it, narrowed by `group_uids`, `social_account_uids` (each must be in scope) and `channels`. Hourly periods over at most 31 days, the others over at most 731 (400 beyond).
 pub async fn posting(__client: &crate::runtime::Client, __body: &PostingInsightQuery) -> crate::runtime::ApiResult<PostingInsightResponse> {
   let mut __path = String::from("/insight/posting");
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await

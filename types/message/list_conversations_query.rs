@@ -7,8 +7,10 @@ use crate::types::primitives::uid::Uid;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.message"))]
 pub struct ListConversationsQuery {
-  pub group_uid: Option<Uid>,
-  pub social_account_uid: Option<Uid>,
+  /// Narrow to these groups, each one the caller may see; omit for everything the caller may see.
+  pub group_uids: Option<Vec<Uid>>,
+  /// Narrow to these accounts, each one in scope; naming any account overrides the groups.
+  pub social_account_uids: Option<Vec<Uid>>,
   /// Narrow to conversations whose participant matches — alias, platform
   /// name, username or phone, as a substring. A term under 2 characters
   /// answers with no rows. Composes with the cursor; not with `uids`.

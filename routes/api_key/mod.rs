@@ -8,7 +8,7 @@ use crate::types::api_key::rotate_api_key_response::RotateApiKeyResponse;
 use crate::types::api_key::update_api_key_permissions_request::UpdateApiKeyPermissionsRequest;
 use crate::types::api_key::update_api_key_request::UpdateApiKeyRequest;
 
-/// Count API keys, optionally filtered by group.
+/// Count API keys, optionally filtered by groups.
 ///
 /// Requires `ViewApiKeys`; the count covers only keys of groups where the caller holds it, and platform keys only for platform staff.
 pub async fn count(__client: &crate::runtime::Client, __query: &ListApiKeysQuery) -> crate::runtime::ApiResult<u64> {
@@ -44,7 +44,7 @@ pub async fn get(__client: &crate::runtime::Client, api_key_uid: &str) -> crate:
   __path = __path.replace("{api_key_uid}", &crate::runtime::encode_path(api_key_uid));
   __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
 }
-/// List API keys, optionally filtered by group.
+/// List API keys, optionally filtered by groups.
 ///
 /// Requires `ViewApiKeys`; the list covers only keys of groups where the caller holds it, and platform keys only for platform staff.
 pub async fn list(__client: &crate::runtime::Client, __query: &ListApiKeysQuery) -> crate::runtime::ApiResult<Vec<ApiKey>> {

@@ -2,13 +2,13 @@
 #![allow(unused_imports, unused_mut, clippy::all)]
 use crate::types::domain::message_search_hit::MessageSearchHit;
 use crate::types::search::message_search_query::MessageSearchQuery;
-use crate::types::domain::search_hit::SearchHit;
+use crate::types::domain::search_hit_kind::SearchHitKind;
 use crate::types::search::search_query::SearchQuery;
 
 /// Search groups, users, contacts and messages: up to `limit` hits of each requested kind, kinds in a fixed order, groups and users ranked, contacts and messages newest first. A preview — the entity lists page the full answers.
 ///
 /// Any authenticated user; groups and users cover the caller's own groups and the people sharing them (every group and user for platform staff); contacts and messages cover the accounts of every group where the caller holds `ViewMessages` (every account for platform staff, none for a caller holding it nowhere).
-pub async fn global(__client: &crate::runtime::Client, __query: &SearchQuery) -> crate::runtime::ApiResult<Vec<SearchHit>> {
+pub async fn global(__client: &crate::runtime::Client, __query: &SearchQuery) -> crate::runtime::ApiResult<Vec<SearchHitKind>> {
   let mut __path = String::from("/search");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }

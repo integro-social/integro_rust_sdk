@@ -8,8 +8,6 @@ use crate::types::insight::hour_of_week::HourOfWeek;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.insight"))]
 pub struct ConversationInsightResponse {
-  /// Accounts the query covered after every filter.
-  pub accounts: i64,
   /// One per period, oldest first, gaps included as zeros.
   pub buckets: Vec<ConversationBucket>,
   /// The whole period folded once; distinct counts span the whole period.

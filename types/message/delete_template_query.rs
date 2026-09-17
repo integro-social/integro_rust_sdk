@@ -8,6 +8,4 @@ pub struct DeleteTemplateQuery {
   /// Any whatsapp account of the WABA whose templates are managed.
   pub social_account_uid: Uid,
   pub name: String,
-  /// Delete only this template id; omitted, every language of `name` goes.
-  pub hsm_id: Option<String>,
 }

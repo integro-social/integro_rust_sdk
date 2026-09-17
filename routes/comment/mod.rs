@@ -50,7 +50,7 @@ pub async fn like(__client: &crate::runtime::Client, social_account_uid: &str, c
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, None::<&()>).await
 }
 /// Poll the unified comment feed: comments with `id` greater than `since_id`,
-/// oldest first, optionally filtered by group, account, or post.
+/// oldest first, optionally filtered by groups, accounts, or post.
 ///
 /// Requires `ViewComments`; the feed covers only comments of groups where the caller holds it.
 pub async fn list(__client: &crate::runtime::Client, __query: &ListCommentsQuery) -> crate::runtime::ApiResult<Vec<Comment>> {
