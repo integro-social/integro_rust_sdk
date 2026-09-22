@@ -15,7 +15,7 @@ pub struct ListConversationsQuery {
   /// name, username or phone, as a substring. A term under 2 characters
   /// answers with no rows. Composes with the cursor; not with `uids`.
   pub q: Option<Text0_8000>,
-  /// Exact conversations to return (≤200), for decorating rows a CRM already
+  /// Exact conversations to return (≤200), for decorating rows a consumer already
   /// holds by uid. Mutually exclusive with the keyset cursor; ordering follows
   /// activity like the plain list.
   pub uids: Option<Vec<Uid>>,

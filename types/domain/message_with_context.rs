@@ -5,7 +5,7 @@ use crate::types::domain::message::Message;
 use crate::types::primitives::uid::Uid;
 
 /// A message enriched with its channel/group context — the squashed shape
-/// CRMs consume from both the polling feed and the webhook fan-out.
+/// a consumer reads from both the polling feed and the webhook fan-out.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.domain"))]
 pub struct MessageWithContext {

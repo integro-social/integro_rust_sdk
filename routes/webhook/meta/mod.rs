@@ -4,7 +4,7 @@ use crate::types::transport::webhook_verify_query::WebhookVerifyQuery;
 
 /// Meta webhook receiver: verifies the payload signature and hands every
 /// messaging event and page change to the feature that owns it, which
-/// stores it (deduplicating redeliveries) and enqueues CRM fan-out events.
+/// stores it (deduplicating redeliveries) and enqueues consumer fan-out events.
 ///
 /// Public — no authentication required; authorization comes from the `X-Hub-Signature-256` HMAC over the raw body.
 pub async fn receive(__client: &crate::runtime::Client) -> crate::runtime::ApiResult<()> {
