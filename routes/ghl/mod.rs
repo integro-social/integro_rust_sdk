@@ -7,6 +7,7 @@ use crate::types::domain::ghl_location::GhlLocation;
 use crate::types::ghl::link_ghl_request::LinkGhlRequest;
 use crate::types::ghl::list_ghl_query::ListGhlQuery;
 use crate::types::ghl::set_ghl_handoff_tag_request::SetGhlHandoffTagRequest;
+use crate::types::ghl::set_ghl_markup_request::SetGhlMarkupRequest;
 
 /// GoHighLevel OAuth redirect target: consumes the state, exchanges the code
 /// and registers (or reconnects) the location; always redirects the browser
@@ -66,6 +67,17 @@ pub async fn list(__client: &crate::runtime::Client, __query: &ListGhlQuery) -> 
 /// Requires `ConnectSocialAccounts` in the location's group.
 pub async fn set_handoff_tag(__client: &crate::runtime::Client, ghl_location_uid: &str, __body: &SetGhlHandoffTagRequest) -> crate::runtime::ApiResult<GhlLocation> {
   let mut __path = String::from("/ghl/{ghl_location_uid}/handoff-tag");
+  __path = __path.replace("{ghl_location_uid}", &crate::runtime::encode_path(ghl_location_uid));
+  __client.request(crate::runtime::Method::PUT, &__path, None::<&()>, Some(__body)).await
+}
+/// Set whether the bridge renders the bracket markup GoHighLevel's agent
+/// writes — `[b]texto[/b]` for bold, `[i]`, `[s]`, `[m]` and `[c]` likewise,
+/// `[br]` for a blank line — into whatsapp formatting before sending. On by
+/// default; off, the text goes out as it arrived.
+///
+/// Requires `ConnectSocialAccounts` in the location's group.
+pub async fn set_markup(__client: &crate::runtime::Client, ghl_location_uid: &str, __body: &SetGhlMarkupRequest) -> crate::runtime::ApiResult<GhlLocation> {
+  let mut __path = String::from("/ghl/{ghl_location_uid}/markup");
   __path = __path.replace("{ghl_location_uid}", &crate::runtime::encode_path(ghl_location_uid));
   __client.request(crate::runtime::Method::PUT, &__path, None::<&()>, Some(__body)).await
 }

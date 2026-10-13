@@ -26,6 +26,10 @@ pub struct GhlLocation {
   /// hub or the paired phone — the hook a location's workflow uses to put its
   /// Conversation AI bot to sleep. `None` = the handoff is off.
   pub handoff_tag: Option<String>,
+  /// Whether the bridge renders the bracket markup in a delivery's text —
+  /// `[b]…[/b]`, `[br]` — into whatsapp formatting before sending it; off, the
+  /// text goes out as it arrived.
+  pub render_markup: bool,
   /// Inbound-sync cursor into `message.id`: the target account's messages
   /// beyond it still owe GHL a delivery.
   pub last_message_id: u64,
