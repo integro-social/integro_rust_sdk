@@ -4,7 +4,7 @@ use crate::types::user::user_membership_response::UserMembershipResponse;
 
 /// List the groups another user belongs to, each carrying the role that membership holds there.
 ///
-/// Requires `ViewUsers`, which only platform staff hold.
+/// Requires `ViewUsers`, which only platform staff and platform API keys can hold.
 pub async fn list(__client: &crate::runtime::Client, user_uid: &str) -> crate::runtime::ApiResult<Vec<UserMembershipResponse>> {
   let mut __path = String::from("/user/{user_uid}/membership");
   __path = __path.replace("{user_uid}", &crate::runtime::encode_path(user_uid));

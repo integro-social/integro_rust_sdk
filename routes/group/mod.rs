@@ -18,7 +18,7 @@ pub async fn count(__client: &crate::runtime::Client) -> crate::runtime::ApiResu
 }
 /// Create a group, optionally with a logo image.
 ///
-/// Requires `CreateGroups`, which is only ever held platform-wide — no group exists yet to scope it to. Rejected — when a logo is attached — when the caller trips the per-user file-upload throttle.
+/// Requires `CreateGroups`, which is only ever held platform-wide — by platform staff and platform API keys, since no group exists yet to scope it to. Rejected — when a logo is attached — when the caller trips the per-user file-upload throttle, an API key counting against the user who created it.
 pub async fn create(__client: &crate::runtime::Client, __form: reqwest::multipart::Form) -> crate::runtime::ApiResult<CreateGroupResponse> {
   let mut __path = String::from("/group");
   __client.request_multipart(crate::runtime::Method::POST, &__path, None::<&()>, __form).await
@@ -66,7 +66,7 @@ pub async fn set_enabled(__client: &crate::runtime::Client, group_uid: &str, __b
 /// `Group.logo_uid`, served by `media.serve` to anyone holding `ViewGroups`
 /// in the group.
 ///
-/// Requires `UpdateGroups` in the group itself, and is rejected when the caller trips the per-user file-upload throttle.
+/// Requires `UpdateGroups` in the group itself, and is rejected when the caller trips the per-user file-upload throttle, an API key counting against the user who created it.
 pub async fn set_logo(__client: &crate::runtime::Client, group_uid: &str, __form: reqwest::multipart::Form) -> crate::runtime::ApiResult<SetGroupLogoResponse> {
   let mut __path = String::from("/group/{group_uid}/logo");
   __path = __path.replace("{group_uid}", &crate::runtime::encode_path(group_uid));

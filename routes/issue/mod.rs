@@ -5,9 +5,9 @@ use crate::types::issue::create_issue_response::CreateIssueResponse;
 use crate::types::domain::issue::Issue;
 use crate::types::issue::set_issue_status_request::SetIssueStatusRequest;
 
-/// Count issues — every issue for a caller holding `ViewIssues`, and only the caller's own reports for everyone else.
+/// Count issues — every issue for a caller holding `ViewIssues`, only the caller's own reports for any other user, and none for any other API key.
 ///
-/// Any authenticated user; `ViewIssues`, which only platform staff hold, is what widens the count beyond the caller's own reports.
+/// Any authenticated caller; `ViewIssues`, which only platform staff and platform API keys can hold, is what widens the count beyond the caller's own reports.
 pub async fn count(__client: &crate::runtime::Client) -> crate::runtime::ApiResult<u64> {
   let mut __path = String::from("/issue/count");
   __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
@@ -21,22 +21,22 @@ pub async fn create(__client: &crate::runtime::Client, __form: reqwest::multipar
 }
 /// Fetch a single issue by uid.
 ///
-/// Any authenticated user for an issue they reported; `ViewIssues`, which only platform staff hold, reaches any issue. An issue the caller may not read reads as not found.
+/// Any authenticated user for an issue they reported; `ViewIssues`, which only platform staff and platform API keys can hold, reaches any issue, and is the only way an API key reaches one. An issue the caller may not read reads as not found.
 pub async fn get(__client: &crate::runtime::Client, issue_uid: &str) -> crate::runtime::ApiResult<Issue> {
   let mut __path = String::from("/issue/{issue_uid}");
   __path = __path.replace("{issue_uid}", &crate::runtime::encode_path(issue_uid));
   __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
 }
-/// List issues, newest first — every issue for a caller holding `ViewIssues`, and only the caller's own reports for everyone else.
+/// List issues, newest first — every issue for a caller holding `ViewIssues`, only the caller's own reports for any other user, and none for any other API key.
 ///
-/// Any authenticated user; `ViewIssues`, which only platform staff hold, is what widens the result beyond the caller's own reports.
+/// Any authenticated caller; `ViewIssues`, which only platform staff and platform API keys can hold, is what widens the result beyond the caller's own reports.
 pub async fn list(__client: &crate::runtime::Client) -> crate::runtime::ApiResult<Vec<Issue>> {
   let mut __path = String::from("/issue");
   __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
 }
 /// Update the status of an issue.
 ///
-/// Requires `ManageIssues`, which only platform staff hold.
+/// Requires `ManageIssues`, which only platform staff and platform API keys can hold.
 pub async fn set_status(__client: &crate::runtime::Client, issue_uid: &str, __body: &SetIssueStatusRequest) -> crate::runtime::ApiResult<()> {
   let mut __path = String::from("/issue/{issue_uid}/status");
   __path = __path.replace("{issue_uid}", &crate::runtime::encode_path(issue_uid));

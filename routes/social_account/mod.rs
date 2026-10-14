@@ -217,7 +217,6 @@ pub async fn native_status(__client: &crate::runtime::Client, social_account_uid
 }
 /// Re-read this account's name and picture from its platform now, rather than
 /// waiting for the daily sweep. Answers `true` when something actually changed.
-///
 /// Never touches the alias — that is yours, and a platform rename is exactly
 /// what it is meant to survive.
 ///

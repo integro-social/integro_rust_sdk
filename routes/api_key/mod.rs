@@ -10,7 +10,7 @@ use crate::types::api_key::update_api_key_request::UpdateApiKeyRequest;
 
 /// Count API keys, optionally filtered by groups.
 ///
-/// Requires `ViewApiKeys`; the count covers only keys of groups where the caller holds it, and platform keys only for platform staff.
+/// Requires `ViewApiKeys`; the count covers only keys of groups where the caller holds it, and platform keys only for platform staff and platform API keys.
 pub async fn count(__client: &crate::runtime::Client, __query: &ListApiKeysQuery) -> crate::runtime::ApiResult<u64> {
   let mut __path = String::from("/api-key/count");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
@@ -19,8 +19,9 @@ pub async fn count(__client: &crate::runtime::Client, __query: &ListApiKeysQuery
 /// group) is the one that stands at platform scope — that comes from the
 /// binding itself, so nothing is added to the grant set — and a group-bound key
 /// may therefore carry no platform-scoped permission at all. Every granted
-/// permission must be one the caller itself holds in the key's scope, and must
-/// bring along whatever that permission requires.
+/// permission must be one the caller itself holds in the key's scope, must
+/// bring along whatever that permission requires, and must not be a
+/// `roles_only` permission — those are held only through a role.
 ///
 /// Requires `CreateApiKeys` and `GrantApiKeyPermissions` in the named group, or both at platform scope when no group is named; every permission granted to the key must also be one the caller holds where the key lives.
 pub async fn create(__client: &crate::runtime::Client, __body: &CreateApiKeyRequest) -> crate::runtime::ApiResult<CreateApiKeyResponse> {
@@ -46,7 +47,7 @@ pub async fn get(__client: &crate::runtime::Client, api_key_uid: &str) -> crate:
 }
 /// List API keys, optionally filtered by groups.
 ///
-/// Requires `ViewApiKeys`; the list covers only keys of groups where the caller holds it, and platform keys only for platform staff.
+/// Requires `ViewApiKeys`; the list covers only keys of groups where the caller holds it, and platform keys only for platform staff and platform API keys.
 pub async fn list(__client: &crate::runtime::Client, __query: &ListApiKeysQuery) -> crate::runtime::ApiResult<Vec<ApiKey>> {
   let mut __path = String::from("/api-key");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
@@ -78,7 +79,8 @@ pub async fn update(__client: &crate::runtime::Client, api_key_uid: &str, __body
 /// Replace the granted permission set of an API key. A platform-scoped
 /// permission is refused on a group-bound key, which never stands at platform
 /// scope; every granted permission must be one the caller itself holds in the
-/// key's scope, and must bring along whatever that permission requires.
+/// key's scope, must bring along whatever that permission requires, and must
+/// not be a `roles_only` permission — those are held only through a role.
 ///
 /// Requires `GrantApiKeyPermissions` in the key's group, or at platform scope for a platform key; every permission granted must also be one the caller holds where the key lives.
 pub async fn update_permissions(__client: &crate::runtime::Client, api_key_uid: &str, __body: &UpdateApiKeyPermissionsRequest) -> crate::runtime::ApiResult<()> {

@@ -9,28 +9,28 @@ pub mod history;
 
 /// Return the most recent host metrics snapshot.
 ///
-/// Requires `ViewPulse`, which only platform staff hold.
+/// Requires `ViewPulse`, which only platform staff and platform API keys can hold.
 pub async fn current(__client: &crate::runtime::Client) -> crate::runtime::ApiResult<PulseSnapshot> {
   let mut __path = String::from("/pulse/current");
   __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
 }
 /// Return the disk, network, and GPU hardware inventory as of a point in time.
 ///
-/// Requires `ViewPulse`, which only platform staff hold.
+/// Requires `ViewPulse`, which only platform staff and platform API keys can hold.
 pub async fn inventory(__client: &crate::runtime::Client, __query: &PulseInventoryQuery) -> crate::runtime::ApiResult<PulseInventoryResponse> {
   let mut __path = String::from("/pulse/inventory");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
 /// Stream live host metrics snapshots over server-sent events.
 ///
-/// Requires `ViewPulse`, which only platform staff hold; the stream is gated at connect.
+/// Requires `ViewPulse`, which only platform staff and platform API keys can hold; the stream is gated at connect.
 pub async fn stream(__client: &crate::runtime::Client, __on_event: impl FnMut(PulseSnapshot)) -> crate::runtime::ApiResult<()> {
   let mut __path = String::from("/pulse/stream");
   __client.sse(&__path, None::<&()>, __on_event).await
 }
 /// Return static system information about the host running the backend.
 ///
-/// Requires `ViewPulse`, which only platform staff hold.
+/// Requires `ViewPulse`, which only platform staff and platform API keys can hold.
 pub async fn system_info(__client: &crate::runtime::Client) -> crate::runtime::ApiResult<PulseSystemInfo> {
   let mut __path = String::from("/pulse/system-info");
   __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await

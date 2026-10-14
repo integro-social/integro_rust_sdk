@@ -8,28 +8,28 @@ use crate::types::domain::pulse_network_metric_row::PulseNetworkMetricRow;
 
 /// List historical disk metrics within a time window.
 ///
-/// Requires `ViewPulse`, which only platform staff hold.
+/// Requires `ViewPulse`, which only platform staff and platform API keys can hold.
 pub async fn disk(__client: &crate::runtime::Client, __query: &PulseHistoryQuery) -> crate::runtime::ApiResult<Vec<PulseDiskMetricRow>> {
   let mut __path = String::from("/pulse/history/disk");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
 /// List historical GPU metrics within a time window.
 ///
-/// Requires `ViewPulse`, which only platform staff hold.
+/// Requires `ViewPulse`, which only platform staff and platform API keys can hold.
 pub async fn gpu(__client: &crate::runtime::Client, __query: &PulseHistoryQuery) -> crate::runtime::ApiResult<Vec<PulseGpuMetricRow>> {
   let mut __path = String::from("/pulse/history/gpu");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
 /// List historical host metrics within a time window.
 ///
-/// Requires `ViewPulse`, which only platform staff hold.
+/// Requires `ViewPulse`, which only platform staff and platform API keys can hold.
 pub async fn host(__client: &crate::runtime::Client, __query: &PulseHistoryQuery) -> crate::runtime::ApiResult<Vec<PulseHostMetricRow>> {
   let mut __path = String::from("/pulse/history/host");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
 /// List historical network metrics within a time window.
 ///
-/// Requires `ViewPulse`, which only platform staff hold.
+/// Requires `ViewPulse`, which only platform staff and platform API keys can hold.
 pub async fn network(__client: &crate::runtime::Client, __query: &PulseHistoryQuery) -> crate::runtime::ApiResult<Vec<PulseNetworkMetricRow>> {
   let mut __path = String::from("/pulse/history/network");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await

@@ -6,21 +6,21 @@ use crate::types::domain::server_uptime_stats::ServerUptimeStats;
 
 /// Get the most recent server uptime record.
 ///
-/// Requires `ViewPulse`, which only platform staff hold.
+/// Requires `ViewPulse`, which only platform staff and platform API keys can hold.
 pub async fn get_latest(__client: &crate::runtime::Client) -> crate::runtime::ApiResult<Option<ServerUptime>> {
   let mut __path = String::from("/uptime/latest");
   __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
 }
 /// Compute aggregate server uptime statistics within a time range.
 ///
-/// Requires `ViewPulse`, which only platform staff hold.
+/// Requires `ViewPulse`, which only platform staff and platform API keys can hold.
 pub async fn get_stats(__client: &crate::runtime::Client, __query: &ServerUptimeRangeQuery) -> crate::runtime::ApiResult<ServerUptimeStats> {
   let mut __path = String::from("/uptime/stat");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
 /// List server uptime records within a time range.
 ///
-/// Requires `ViewPulse`, which only platform staff hold.
+/// Requires `ViewPulse`, which only platform staff and platform API keys can hold.
 pub async fn list(__client: &crate::runtime::Client, __query: &ServerUptimeRangeQuery) -> crate::runtime::ApiResult<Vec<ServerUptime>> {
   let mut __path = String::from("/uptime");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await

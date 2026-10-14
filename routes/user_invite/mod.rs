@@ -22,7 +22,7 @@ pub async fn accept(__client: &crate::runtime::Client, __body: &UserInviteAccept
 }
 /// Count pending (unaccepted) user invitations.
 ///
-/// Requires `ViewInvites`; the count covers only invites into groups where the caller holds it, and platform invites only for platform staff.
+/// Requires `ViewInvites`; the count covers only invites into groups where the caller holds it, and platform invites only for platform staff and platform API keys.
 pub async fn count(__client: &crate::runtime::Client) -> crate::runtime::ApiResult<u64> {
   let mut __path = String::from("/user-invite/count");
   __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
@@ -44,7 +44,7 @@ pub async fn join(__client: &crate::runtime::Client, __body: &UserInviteTokenReq
 }
 /// List pending (unaccepted) user invitations.
 ///
-/// Requires `ViewInvites`; the list covers only invites into groups where the caller holds it, and platform invites only for platform staff.
+/// Requires `ViewInvites`; the list covers only invites into groups where the caller holds it, and platform invites only for platform staff and platform API keys.
 pub async fn list(__client: &crate::runtime::Client) -> crate::runtime::ApiResult<Vec<UserInvite>> {
   let mut __path = String::from("/user-invite");
   __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await

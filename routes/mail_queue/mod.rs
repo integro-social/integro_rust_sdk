@@ -5,7 +5,7 @@ use crate::types::mailing::email_queue_list_query::EmailQueueListQuery;
 
 /// List queued emails, optionally filtered by delivery status.
 ///
-/// Requires `ManageEmailQueue`, which only platform staff hold.
+/// Requires `ManageEmailQueue`, which only platform staff and platform API keys can hold.
 pub async fn list(__client: &crate::runtime::Client, __query: &EmailQueueListQuery) -> crate::runtime::ApiResult<Vec<EmailQueueItem>> {
   let mut __path = String::from("/mail-queue");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
@@ -15,7 +15,7 @@ pub async fn list(__client: &crate::runtime::Client, __query: &EmailQueueListQue
 /// failed. An email already handed to the mail server is refused — it settles
 /// on its own.
 ///
-/// Requires `ManageEmailQueue`, which only platform staff hold.
+/// Requires `ManageEmailQueue`, which only platform staff and platform API keys can hold.
 pub async fn remove(__client: &crate::runtime::Client, id: &str) -> crate::runtime::ApiResult<()> {
   let mut __path = String::from("/mail-queue/{id}");
   __path = __path.replace("{id}", &crate::runtime::encode_path(id));
@@ -24,7 +24,7 @@ pub async fn remove(__client: &crate::runtime::Client, id: &str) -> crate::runti
 /// Reset a failed queued email so the worker attempts delivery again. A
 /// subscriber record goes back to pending-send.
 ///
-/// Requires `ManageEmailQueue`, which only platform staff hold.
+/// Requires `ManageEmailQueue`, which only platform staff and platform API keys can hold.
 pub async fn retry(__client: &crate::runtime::Client, id: &str) -> crate::runtime::ApiResult<()> {
   let mut __path = String::from("/mail-queue/{id}/retry");
   __path = __path.replace("{id}", &crate::runtime::encode_path(id));

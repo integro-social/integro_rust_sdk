@@ -26,7 +26,7 @@ pub async fn change_password(__client: &crate::runtime::Client, __body: &UserCha
 }
 /// Count all users.
 ///
-/// Requires `ViewUsers`, which only platform staff hold.
+/// Requires `ViewUsers`, which only platform staff and platform API keys can hold.
 pub async fn count(__client: &crate::runtime::Client) -> crate::runtime::ApiResult<u64> {
   let mut __path = String::from("/user/count");
   __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
@@ -56,7 +56,7 @@ pub async fn delete(__client: &crate::runtime::Client, user_uid: &str) -> crate:
 }
 /// Get a single user by uid.
 ///
-/// Requires `ViewUsers`, which only platform staff hold.
+/// Requires `ViewUsers`, which only platform staff and platform API keys can hold.
 pub async fn get(__client: &crate::runtime::Client, user_uid: &str) -> crate::runtime::ApiResult<User> {
   let mut __path = String::from("/user/{user_uid}");
   __path = __path.replace("{user_uid}", &crate::runtime::encode_path(user_uid));
@@ -71,7 +71,7 @@ pub async fn get_self(__client: &crate::runtime::Client) -> crate::runtime::ApiR
 }
 /// List all users.
 ///
-/// Requires `ViewUsers`, which only platform staff hold.
+/// Requires `ViewUsers`, which only platform staff and platform API keys can hold.
 pub async fn list(__client: &crate::runtime::Client) -> crate::runtime::ApiResult<Vec<User>> {
   let mut __path = String::from("/user");
   __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await

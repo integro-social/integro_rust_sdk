@@ -6,14 +6,14 @@ use crate::types::domain::audit_log_stats::AuditLogStats;
 
 /// List audit log entries matching the given filters and time window.
 ///
-/// Requires `ViewAuditLogs`; platform staff read every entry, any other holder only entries stamped with a group where they hold it — an entry carrying no group is staff-only.
+/// Requires `ViewAuditLogs`; platform staff and platform API keys read every entry, any other holder only entries stamped with a group where they hold it — an entry carrying no group is theirs alone.
 pub async fn list(__client: &crate::runtime::Client, __query: &AuditLogQuery) -> crate::runtime::ApiResult<Vec<AuditLog>> {
   let mut __path = String::from("/audit-log");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
 /// Aggregate audit log statistics for the given filters and time window.
 ///
-/// Requires `ViewAuditLogs`; platform staff aggregate every entry, any other holder only entries stamped with a group where they hold it — an entry carrying no group is staff-only.
+/// Requires `ViewAuditLogs`; platform staff and platform API keys aggregate every entry, any other holder only entries stamped with a group where they hold it — an entry carrying no group is theirs alone.
 pub async fn stats(__client: &crate::runtime::Client, __query: &AuditLogQuery) -> crate::runtime::ApiResult<AuditLogStats> {
   let mut __path = String::from("/audit-log/stat");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
