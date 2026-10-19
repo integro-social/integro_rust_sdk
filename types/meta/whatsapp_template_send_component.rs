@@ -3,9 +3,6 @@
 use crate::types::meta::whatsapp_template_button_sub_type::WhatsappTemplateButtonSubType;
 use crate::types::meta::whatsapp_template_parameter::WhatsappTemplateParameter;
 
-/// One substitution block of a template *send* — the values that fill an
-/// approved template's placeholders. Serializes straight to the Cloud API
-/// shape: Meta spells these lowercase already, so no boundary translation.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.meta"))]
 #[serde(tag = "type")]
@@ -17,8 +14,6 @@ pub enum WhatsappTemplateSendComponent {
   Body {
     parameters: Vec<WhatsappTemplateParameter>,
   },
-  /// One button's payload. `index` is the button's position (`"0"`-based) in
-  /// the approved definition — Meta's own field, a string.
   Button {
     sub_type: WhatsappTemplateButtonSubType,
     index: String,

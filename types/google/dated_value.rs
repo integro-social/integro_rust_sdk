@@ -2,7 +2,6 @@
 #![allow(unused_imports, non_snake_case, non_camel_case_types, clippy::all)]
 use crate::types::google::date::Date;
 
-/// One day's value; int64 arrives as a string, absent means no data.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.google"))]
 #[serde(rename_all = "camelCase")]

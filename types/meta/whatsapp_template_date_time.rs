@@ -4,7 +4,5 @@
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.meta"))]
 pub struct WhatsappTemplateDateTime {
-  /// Meta localizes only what it can parse; everything else renders verbatim,
-  /// so the caller always supplies the text it wants shown.
   pub fallback_value: String,
 }

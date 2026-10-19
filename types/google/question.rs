@@ -7,7 +7,6 @@ use crate::types::google::qanda_author::QandaAuthor;
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.google"))]
 #[serde(rename_all = "camelCase")]
 pub struct Question {
-  /// Resource name, `locations/{l}/questions/{q}`.
   pub name: Option<String>,
   pub text: Option<String>,
   pub author: Option<QandaAuthor>,

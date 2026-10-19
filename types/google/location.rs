@@ -10,12 +10,10 @@ use crate::types::google::phone_numbers::PhoneNumbers;
 use crate::types::google::postal_address::PostalAddress;
 use crate::types::google::special_hours::SpecialHours;
 
-/// A business location, thinned to the fields the read mask requests.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.google"))]
 #[serde(rename_all = "camelCase")]
 pub struct Location {
-  /// Resource name, `locations/{location_id}` — no account prefix on v1.
   pub name: Option<String>,
   pub title: Option<String>,
   pub phone_numbers: Option<PhoneNumbers>,

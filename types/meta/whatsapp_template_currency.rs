@@ -4,10 +4,7 @@
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.meta"))]
 pub struct WhatsappTemplateCurrency {
-  /// Rendered as-is if the recipient's locale is unsupported.
   pub fallback_value: String,
-  /// ISO 4217, e.g. `BRL`.
   pub code: String,
-  /// The amount multiplied by 1000 — Meta's integer money representation.
   pub amount_1000: i64,
 }

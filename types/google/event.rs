@@ -4,8 +4,6 @@ use crate::types::google::event_attendee::EventAttendee;
 use crate::types::google::event_date_time::EventDateTime;
 use crate::types::google::extended_properties::ExtendedProperties;
 
-/// A Google Calendar event (response shape). Most fields are optional because
-/// Google omits them depending on event kind and the caller's access.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.google"))]
 #[serde(rename_all = "camelCase")]

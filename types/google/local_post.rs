@@ -5,14 +5,10 @@ use crate::types::google::local_post_event::LocalPostEvent;
 use crate::types::google::local_post_offer::LocalPostOffer;
 use crate::types::google::post_media::PostMedia;
 
-/// A local post ("What's new" card on the profile). `topic_type` is
-/// `STANDARD`, `EVENT`, `OFFER` or `ALERT`; `state` and `search_url` are
-/// server-set.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.google"))]
 #[serde(rename_all = "camelCase")]
 pub struct LocalPost {
-  /// Resource name, `accounts/{a}/locations/{l}/localPosts/{p}`.
   pub name: Option<String>,
   pub language_code: Option<String>,
   pub summary: Option<String>,

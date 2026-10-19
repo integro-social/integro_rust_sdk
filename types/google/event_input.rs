@@ -4,8 +4,6 @@ use crate::types::google::event_attendee::EventAttendee;
 use crate::types::google::event_date_time::EventDateTime;
 use crate::types::google::extended_properties::ExtendedProperties;
 
-/// Mutable event payload for insert/patch. Only set fields are sent — which
-/// also means a PATCH can never *clear* a field.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.google"))]
 #[serde(rename_all = "camelCase")]

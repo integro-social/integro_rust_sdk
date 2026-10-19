@@ -3,7 +3,6 @@
 use crate::types::google::date::Date;
 use crate::types::google::time_of_day::TimeOfDay;
 
-/// A dated exception to regular hours — closed, or different hours.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.google"))]
 #[serde(rename_all = "camelCase")]

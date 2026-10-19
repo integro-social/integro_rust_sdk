@@ -3,13 +3,10 @@
 use crate::types::google::review_reply::ReviewReply;
 use crate::types::google::reviewer::Reviewer;
 
-/// A customer review. `star_rating` is `ONE`…`FIVE`; `comment` may carry a
-/// `(Translated by Google)` block alongside the original text.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.google"))]
 #[serde(rename_all = "camelCase")]
 pub struct Review {
-  /// Resource name, `accounts/{a}/locations/{l}/reviews/{r}`.
   pub name: Option<String>,
   pub review_id: Option<String>,
   pub reviewer: Option<Reviewer>,

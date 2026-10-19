@@ -2,13 +2,10 @@
 #![allow(unused_imports, non_snake_case, non_camel_case_types, clippy::all)]
 use crate::types::google::menu::Menu;
 
-/// The location's structured menus — the category-specific dataset food
-/// businesses get; `metadata.can_have_food_menus` says whether it applies.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.google"))]
 #[serde(rename_all = "camelCase")]
 pub struct FoodMenus {
-  /// Resource name, `accounts/{a}/locations/{l}/foodMenus`.
   pub name: Option<String>,
   #[cfg_attr(feature = "tapir", tapir(optional = nullable))]
   pub menus: Vec<Menu>,

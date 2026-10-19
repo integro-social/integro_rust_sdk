@@ -4,13 +4,10 @@ use crate::types::google::location_association::LocationAssociation;
 use crate::types::google::media_dimensions::MediaDimensions;
 use crate::types::google::media_insights::MediaInsights;
 
-/// A photo/video on the profile. On create, send `media_format: PHOTO` (or
-/// `VIDEO`), `location_association` and a publicly fetchable `source_url`.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.google"))]
 #[serde(rename_all = "camelCase")]
 pub struct MediaItem {
-  /// Resource name, `accounts/{a}/locations/{l}/media/{m}`.
   pub name: Option<String>,
   pub media_format: Option<String>,
   pub location_association: Option<LocationAssociation>,
