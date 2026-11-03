@@ -18,7 +18,7 @@ pub async fn get_stats(__client: &crate::runtime::Client, __query: &ServerUptime
   let mut __path = String::from("/uptime/stat");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
-/// List server uptime records within a time range.
+/// List server uptime records within a time range; a range holding more than 20 000 records is rejected rather than cut short.
 ///
 /// Requires `ViewPulse`, which only platform staff and platform API keys can hold.
 pub async fn list(__client: &crate::runtime::Client, __query: &ServerUptimeRangeQuery) -> crate::runtime::ApiResult<Vec<ServerUptime>> {

@@ -2,12 +2,12 @@
 #![allow(unused_imports, non_snake_case, non_camel_case_types, clippy::all)]
 use crate::types::primitives::number1_50::Number1_50;
 use crate::types::domain::search_kind::SearchKind;
-use crate::types::primitives::text0_8000::Text0_8000;
+use crate::types::primitives::text0_200::Text0_200;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.search"))]
 pub struct SearchQuery {
-  pub q: Text0_8000,
+  pub q: Text0_200,
   /// Hits per kind (1..=50, default 10) — a preview cap, not a page.
   pub limit: Option<Number1_50>,
   /// Only these kinds; absent or empty means every kind.

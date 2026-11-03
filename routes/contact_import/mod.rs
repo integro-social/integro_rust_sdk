@@ -2,8 +2,13 @@
 #![allow(unused_imports, unused_mut, clippy::all)]
 use crate::types::contact_import::contact_import_detail::ContactImportDetail;
 use crate::types::domain::contact_import_row::ContactImportRow;
+use crate::types::domain::contact_import_status_counts::ContactImportStatusCounts;
+use crate::types::contact_import::count_imports_query::CountImportsQuery;
+use crate::types::contact_import::legacy_list_import_rows_query::LegacyListImportRowsQuery;
+use crate::types::contact_import::legacy_list_imports_query::LegacyListImportsQuery;
 use crate::types::contact_import::list_import_rows_query::ListImportRowsQuery;
 use crate::types::contact_import::list_imports_query::ListImportsQuery;
+use crate::types::primitives::page::Page;
 use crate::types::contact_import::update_contact_import_request::UpdateContactImportRequest;
 use crate::types::contact_import::update_import_row_request::UpdateImportRowRequest;
 use crate::types::contact_import::upload_contact_import_form::UploadContactImportForm;
@@ -16,6 +21,13 @@ pub async fn cancel(__client: &crate::runtime::Client, import_uid: &str) -> crat
   let mut __path = String::from("/contact-import/{import_uid}/cancel");
   __path = __path.replace("{import_uid}", &crate::runtime::encode_path(import_uid));
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, None::<&()>).await
+}
+/// How many imports stand in each status, optionally only some groups' — the totals a paged list cannot show.
+///
+/// Requires `ImportContacts`; the counts cover only imports of groups where the caller holds it.
+pub async fn count(__client: &crate::runtime::Client, __query: &CountImportsQuery) -> crate::runtime::ApiResult<ContactImportStatusCounts> {
+  let mut __path = String::from("/contact-import/count");
+  __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
 /// Delete an import and its rows. Refused while loading — pause or cancel
 /// first. Conversations already created stay.
@@ -45,10 +57,17 @@ pub async fn get(__client: &crate::runtime::Client, import_uid: &str) -> crate::
   __path = __path.replace("{import_uid}", &crate::runtime::encode_path(import_uid));
   __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
 }
-/// List imports, newest first, optionally only some groups'.
+/// List imports one page at a time, newest first unless `order` says otherwise, optionally only some groups', one status or a search.
 ///
 /// Requires `ImportContacts`; the list covers only imports of groups where the caller holds it.
-pub async fn list(__client: &crate::runtime::Client, __query: &ListImportsQuery) -> crate::runtime::ApiResult<Vec<ContactImportDetail>> {
+pub async fn list(__client: &crate::runtime::Client, __query: &ListImportsQuery) -> crate::runtime::ApiResult<Page<ContactImportDetail>> {
+  let mut __path = String::from("/v2/contact-import");
+  __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
+}
+/// List imports, newest first, optionally only some groups' — the pre-12.0.0 form, transitional for consumers built against 11.x; new consumers page `contactImport.list` instead, and this route goes away in a future major.
+///
+/// Requires `ImportContacts`; the list covers only imports of groups where the caller holds it.
+pub async fn list_legacy(__client: &crate::runtime::Client, __query: &LegacyListImportsQuery) -> crate::runtime::ApiResult<Vec<ContactImportDetail>> {
   let mut __path = String::from("/contact-import");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
@@ -89,11 +108,19 @@ pub async fn resume(__client: &crate::runtime::Client, import_uid: &str) -> crat
   __path = __path.replace("{import_uid}", &crate::runtime::encode_path(import_uid));
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, None::<&()>).await
 }
-/// A page of the import's rows in file order, optionally one verdict only —
-/// the fix table and the verdict drill-downs.
+/// The import's rows one page at a time, in file order, optionally one verdict
+/// only or a search — the fix table and the verdict drill-downs.
 ///
 /// Requires `ImportContacts` in the import's group.
-pub async fn rows(__client: &crate::runtime::Client, import_uid: &str, __query: &ListImportRowsQuery) -> crate::runtime::ApiResult<Vec<ContactImportRow>> {
+pub async fn rows(__client: &crate::runtime::Client, import_uid: &str, __query: &ListImportRowsQuery) -> crate::runtime::ApiResult<Page<ContactImportRow>> {
+  let mut __path = String::from("/v2/contact-import/{import_uid}/row");
+  __path = __path.replace("{import_uid}", &crate::runtime::encode_path(import_uid));
+  __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
+}
+/// A page of the import's rows in file order, optionally one verdict only, `after_id` paging forward — the pre-12.0.0 form, transitional for consumers built against 11.x; new consumers page `contactImport.rows` instead, and this route goes away in a future major.
+///
+/// Requires `ImportContacts` in the import's group.
+pub async fn rows_legacy(__client: &crate::runtime::Client, import_uid: &str, __query: &LegacyListImportRowsQuery) -> crate::runtime::ApiResult<Vec<ContactImportRow>> {
   let mut __path = String::from("/contact-import/{import_uid}/row");
   __path = __path.replace("{import_uid}", &crate::runtime::encode_path(import_uid));
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await

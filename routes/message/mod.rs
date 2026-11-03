@@ -5,9 +5,11 @@ use crate::types::message::backfill_response::BackfillResponse;
 use crate::types::message::edit_message_request::EditMessageRequest;
 use crate::types::message::forward_message_request::ForwardMessageRequest;
 use crate::types::message::forward_outcome::ForwardOutcome;
+use crate::types::message::legacy_list_messages_query::LegacyListMessagesQuery;
 use crate::types::message::list_messages_query::ListMessagesQuery;
 use crate::types::domain::message::Message;
 use crate::types::domain::message_with_context::MessageWithContext;
+use crate::types::primitives::page::Page;
 use crate::types::message::react_to_message_request::ReactToMessageRequest;
 use crate::types::message::send_message_request::SendMessageRequest;
 use crate::types::primitives::uid::Uid;
@@ -94,14 +96,21 @@ pub async fn forward(__client: &crate::runtime::Client, conversation_uid: &str, 
   __path = __path.replace("{message_uid}", &crate::runtime::encode_path(message_uid));
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
 }
-/// Poll the unified message feed across channels: messages with `id` greater
-/// than `since_id`, oldest first, optionally filtered by groups or accounts.
-/// `uids` instead returns exactly those messages (≤200, order unspecified),
-/// for resolving rows the caller already holds by uid; not combinable with
-/// `since_id`.
+/// Poll the unified message feed across channels one page at a time: messages with `id` greater
+/// than `since_id`, oldest first, optionally filtered by groups or accounts; `next` sent back as
+/// `cursor` continues the same walk. `uids` instead returns exactly those messages (≤200, order
+/// unspecified), for resolving rows the caller already holds by uid; not combinable with
+/// `since_id` or `cursor`.
 ///
 /// Requires `ViewMessages`; the feed covers only messages of groups where the caller holds it.
-pub async fn list(__client: &crate::runtime::Client, __query: &ListMessagesQuery) -> crate::runtime::ApiResult<Vec<MessageWithContext>> {
+pub async fn list(__client: &crate::runtime::Client, __query: &ListMessagesQuery) -> crate::runtime::ApiResult<Page<MessageWithContext>> {
+  let mut __path = String::from("/v2/message");
+  __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
+}
+/// Poll the unified message feed across channels, messages with `id` greater than `since_id` oldest first, or exactly `uids` — the pre-12.0.0 form, transitional for consumers built against 11.x; new consumers page `message.list` instead, and this route goes away in a future major.
+///
+/// Requires `ViewMessages`; the feed covers only messages of groups where the caller holds it.
+pub async fn list_legacy(__client: &crate::runtime::Client, __query: &LegacyListMessagesQuery) -> crate::runtime::ApiResult<Vec<MessageWithContext>> {
   let mut __path = String::from("/message");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }

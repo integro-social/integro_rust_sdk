@@ -6,7 +6,7 @@ use crate::types::user_session::user_session_login_response::UserSessionLoginRes
 use crate::types::user_session::user_session_logout_all_response::UserSessionLogoutAllResponse;
 use crate::types::user_session::user_session_row::UserSessionRow;
 
-/// List active sessions for the caller or, when a user is specified, for another user.
+/// List active sessions for the caller or, when a user is specified, for another user — whole, since a user holds at most `max_sessions_per_user` sessions.
 ///
 /// Any authenticated user for their own sessions; naming another user requires `ViewUserSessions`, which only platform staff hold.
 pub async fn list(__client: &crate::runtime::Client, __query: &ListUserSessionsQuery) -> crate::runtime::ApiResult<Vec<UserSessionRow>> {

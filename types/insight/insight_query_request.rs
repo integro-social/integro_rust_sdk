@@ -14,7 +14,7 @@ pub struct InsightQueryRequest {
   pub group_uids: Option<Vec<Uid>>,
   /// Narrow to these accounts; every one must belong to the declared channel.
   pub social_account_uids: Option<Vec<Uid>>,
-  /// Inclusive range over snapshot days (unix ms); defaults to the last 30 days.
+  /// Inclusive range over snapshot days (unix ms), at most 731 days; defaults to the last 30 days.
   pub since: Option<Timestamp>,
   pub until: Option<Timestamp>,
   pub granularity: Granularity,

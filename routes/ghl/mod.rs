@@ -2,10 +2,14 @@
 #![allow(unused_imports, unused_mut, clippy::all)]
 use crate::types::ghl::connect_ghl_request::ConnectGhlRequest;
 use crate::types::ghl::connect_ghl_response::ConnectGhlResponse;
+use crate::types::ghl::count_ghl_query::CountGhlQuery;
 use crate::types::ghl::ghl_callback_query::GhlCallbackQuery;
 use crate::types::domain::ghl_location::GhlLocation;
+use crate::types::domain::ghl_location_counts::GhlLocationCounts;
+use crate::types::ghl::legacy_list_ghl_query::LegacyListGhlQuery;
 use crate::types::ghl::link_ghl_request::LinkGhlRequest;
 use crate::types::ghl::list_ghl_query::ListGhlQuery;
+use crate::types::primitives::page::Page;
 use crate::types::ghl::set_ghl_handoff_tag_request::SetGhlHandoffTagRequest;
 use crate::types::ghl::set_ghl_markup_request::SetGhlMarkupRequest;
 
@@ -26,6 +30,14 @@ pub async fn callback(__client: &crate::runtime::Client, __query: &GhlCallbackQu
 pub async fn connect(__client: &crate::runtime::Client, __body: &ConnectGhlRequest) -> crate::runtime::ApiResult<ConnectGhlResponse> {
   let mut __path = String::from("/ghl/connect");
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
+}
+/// Count the GoHighLevel locations the caller can see: all of them, those
+/// bridging no account yet and those whose grant needs reconnecting.
+///
+/// Requires `ViewSocialAccounts`; the counts cover only locations of groups where the caller holds it.
+pub async fn count(__client: &crate::runtime::Client, __query: &CountGhlQuery) -> crate::runtime::ApiResult<GhlLocationCounts> {
+  let mut __path = String::from("/ghl/count");
+  __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
 /// Disconnect the location, deleting its stored grant and its binding.
 /// Reinstalling the app from GoHighLevel is what brings it back.
@@ -49,12 +61,20 @@ pub async fn link(__client: &crate::runtime::Client, ghl_location_uid: &str, __b
   __path = __path.replace("{ghl_location_uid}", &crate::runtime::encode_path(ghl_location_uid));
   __client.request(crate::runtime::Method::PUT, &__path, None::<&()>, Some(__body)).await
 }
-/// List the installed GoHighLevel locations, optionally filtered by groups, each
-/// carrying the whatsapp account it bridges (`target_account_uid`, null while
-/// unlinked) and whether its grant needs reconnecting.
+/// List the installed GoHighLevel locations one page at a time, most recently
+/// connected first unless `order` says otherwise, optionally filtered by groups,
+/// each carrying the whatsapp account it bridges (`target_account_uid`, null
+/// while unlinked) and whether its grant needs reconnecting.
 ///
 /// Requires `ViewSocialAccounts`; the list covers only locations of groups where the caller holds it.
-pub async fn list(__client: &crate::runtime::Client, __query: &ListGhlQuery) -> crate::runtime::ApiResult<Vec<GhlLocation>> {
+pub async fn list(__client: &crate::runtime::Client, __query: &ListGhlQuery) -> crate::runtime::ApiResult<Page<GhlLocation>> {
+  let mut __path = String::from("/v2/ghl");
+  __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
+}
+/// List the installed GoHighLevel locations, optionally filtered by groups, all at once — the pre-12.0.0 form, transitional for consumers built against 11.x; new consumers page `ghl.list` instead, and this route goes away in a future major.
+///
+/// Requires `ViewSocialAccounts`; the list covers only locations of groups where the caller holds it.
+pub async fn list_legacy(__client: &crate::runtime::Client, __query: &LegacyListGhlQuery) -> crate::runtime::ApiResult<Vec<GhlLocation>> {
   let mut __path = String::from("/ghl");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }

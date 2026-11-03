@@ -5,7 +5,7 @@ use crate::types::primitives::timestamp::Timestamp;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.insight"))]
 pub struct InsightHistoryQuery {
-  /// Inclusive range over snapshot days (unix ms); defaults to the last 30 days.
+  /// Inclusive range over snapshot days (unix ms), at most 731 days; defaults to the last 30 days.
   pub since: Option<Timestamp>,
   pub until: Option<Timestamp>,
 }

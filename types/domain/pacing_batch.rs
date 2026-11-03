@@ -3,9 +3,6 @@
 use crate::types::primitives::number1_100000::Number1_100000;
 use crate::types::primitives::number1_3600000::Number1_3600000;
 
-/// A paced channel's batch pause: how many sends go out before the queue takes
-/// a long pause, and how long that pause is. One value, so a size without a
-/// pause — or a pause without a size — cannot be written down.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.domain"))]
 pub struct PacingBatch {

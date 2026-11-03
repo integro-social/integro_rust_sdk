@@ -8,8 +8,12 @@ use crate::types::call::conversation_calls_query::ConversationCallsQuery;
 use crate::types::message::conversation_message_count_query::ConversationMessageCountQuery;
 use crate::types::message::conversation_messages_query::ConversationMessagesQuery;
 use crate::types::message::create_conversation_request::CreateConversationRequest;
+use crate::types::call::legacy_conversation_calls_query::LegacyConversationCallsQuery;
+use crate::types::message::legacy_conversation_messages_query::LegacyConversationMessagesQuery;
+use crate::types::message::legacy_list_conversations_query::LegacyListConversationsQuery;
 use crate::types::message::list_conversations_query::ListConversationsQuery;
 use crate::types::domain::message::Message;
+use crate::types::primitives::page::Page;
 use crate::types::message::set_conversation_alias_request::SetConversationAliasRequest;
 
 /// Send a presence signal into a conversation: mark_seen, typing_on, or
@@ -49,10 +53,18 @@ pub async fn avatar(__client: &crate::runtime::Client, conversation_uid: &str) -
   __path = __path.replace("{conversation_uid}", &crate::runtime::encode_path(conversation_uid));
   __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
 }
-/// List a conversation's calls, newest first; `before_id` pages older history.
+/// List a conversation's calls one page at a time, newest first; `next` sent back as `cursor` reads older history.
 ///
 /// Requires `ViewMessages` in the conversation's group.
-pub async fn calls(__client: &crate::runtime::Client, conversation_uid: &str, __query: &ConversationCallsQuery) -> crate::runtime::ApiResult<Vec<Call>> {
+pub async fn calls(__client: &crate::runtime::Client, conversation_uid: &str, __query: &ConversationCallsQuery) -> crate::runtime::ApiResult<Page<Call>> {
+  let mut __path = String::from("/v2/conversation/{conversation_uid}/call");
+  __path = __path.replace("{conversation_uid}", &crate::runtime::encode_path(conversation_uid));
+  __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
+}
+/// List a conversation's calls, newest first, `before_id` paging older history — the pre-12.0.0 form, transitional for consumers built against 11.x; new consumers page `conversation.calls` instead, and this route goes away in a future major.
+///
+/// Requires `ViewMessages` in the conversation's group.
+pub async fn calls_legacy(__client: &crate::runtime::Client, conversation_uid: &str, __query: &LegacyConversationCallsQuery) -> crate::runtime::ApiResult<Vec<Call>> {
   let mut __path = String::from("/conversation/{conversation_uid}/call");
   __path = __path.replace("{conversation_uid}", &crate::runtime::encode_path(conversation_uid));
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
@@ -95,15 +107,21 @@ pub async fn delete(__client: &crate::runtime::Client, conversation_uid: &str) -
   __path = __path.replace("{conversation_uid}", &crate::runtime::encode_path(conversation_uid));
   __client.request(crate::runtime::Method::DELETE, &__path, None::<&()>, None::<&()>).await
 }
-/// List conversations, newest activity first, optionally filtered by groups or
-/// social accounts; `before_activity_at`+`before_uid` page older activity
-/// (keyset cursor). Rows carry the denormalized chat-list summary (unread
-/// badge + last-message preview). `q` narrows to conversations whose
-/// participant (alias, name, username, phone) contains it — a term under 2
-/// characters answers with no rows; not combinable with `uids`.
+/// List conversations one page at a time, newest activity first, optionally filtered by groups or
+/// social accounts; `next` sent back as `cursor` reads older activity. Rows carry the denormalized
+/// chat-list summary (unread badge + last-message preview). `q` narrows to conversations whose
+/// participant (alias, name, username, phone) contains it — a term under 2 characters answers with
+/// no rows. `uids` instead returns exactly those conversations (≤200), not combinable with `q` or `cursor`.
 ///
 /// Requires `ViewMessages`; the list covers only conversations of groups where the caller holds it.
-pub async fn list(__client: &crate::runtime::Client, __query: &ListConversationsQuery) -> crate::runtime::ApiResult<Vec<Conversation>> {
+pub async fn list(__client: &crate::runtime::Client, __query: &ListConversationsQuery) -> crate::runtime::ApiResult<Page<Conversation>> {
+  let mut __path = String::from("/v2/conversation");
+  __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
+}
+/// List conversations, newest activity first, optionally filtered by groups or social accounts, `before_activity_at`+`before_uid` paging older activity — the pre-12.0.0 form, transitional for consumers built against 11.x; new consumers page `conversation.list` instead, and this route goes away in a future major.
+///
+/// Requires `ViewMessages`; the list covers only conversations of groups where the caller holds it.
+pub async fn list_legacy(__client: &crate::runtime::Client, __query: &LegacyListConversationsQuery) -> crate::runtime::ApiResult<Vec<Conversation>> {
   let mut __path = String::from("/conversation");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
@@ -116,13 +134,22 @@ pub async fn message_count(__client: &crate::runtime::Client, conversation_uid: 
   __path = __path.replace("{conversation_uid}", &crate::runtime::encode_path(conversation_uid));
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
-/// List a conversation's messages, newest first; `before_id` pages older
-/// history. `after_id` pages newer history from an anchored message: each
-/// page is the oldest `limit` rows above the cursor, still newest-first on
-/// the wire (never both cursors).
+/// List a conversation's messages one page at a time, newest first. `before_id` and `after_id` anchor the
+/// page on a message the caller already holds — strictly older, strictly newer, or both for the span between.
+/// Without `after_id` the walk runs older from the newest match; with it the walk runs newer, each page
+/// the oldest `limit` messages above the anchor, still newest first on the wire. `next` sent back as
+/// `cursor` continues that same walk.
 ///
 /// Requires `ViewMessages` in the conversation's group.
-pub async fn messages(__client: &crate::runtime::Client, conversation_uid: &str, __query: &ConversationMessagesQuery) -> crate::runtime::ApiResult<Vec<Message>> {
+pub async fn messages(__client: &crate::runtime::Client, conversation_uid: &str, __query: &ConversationMessagesQuery) -> crate::runtime::ApiResult<Page<Message>> {
+  let mut __path = String::from("/v2/conversation/{conversation_uid}/message");
+  __path = __path.replace("{conversation_uid}", &crate::runtime::encode_path(conversation_uid));
+  __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
+}
+/// List a conversation's messages, newest first, `before_id` paging older history and `after_id` newer — the pre-12.0.0 form, transitional for consumers built against 11.x; new consumers page `conversation.messages` instead, and this route goes away in a future major.
+///
+/// Requires `ViewMessages` in the conversation's group.
+pub async fn messages_legacy(__client: &crate::runtime::Client, conversation_uid: &str, __query: &LegacyConversationMessagesQuery) -> crate::runtime::ApiResult<Vec<Message>> {
   let mut __path = String::from("/conversation/{conversation_uid}/message");
   __path = __path.replace("{conversation_uid}", &crate::runtime::encode_path(conversation_uid));
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await

@@ -13,7 +13,7 @@ pub async fn delete(__client: &crate::runtime::Client, kind: &str) -> crate::run
   __path = __path.replace("{kind}", &crate::runtime::encode_path(kind));
   __client.request(crate::runtime::Method::DELETE, &__path, None::<&()>, None::<&()>).await
 }
-/// List the caller's own enrolled MFA factors.
+/// List the caller's own enrolled MFA factors — at most one per factor kind, so the list is whole.
 ///
 /// Authenticated user acting on their own factors; no permission required.
 pub async fn list(__client: &crate::runtime::Client) -> crate::runtime::ApiResult<Vec<UserMfaFactorRow>> {

@@ -2,6 +2,7 @@
 pub mod comment_create;
 pub mod comment_message_request;
 pub mod create_comment_request;
+pub mod legacy_list_comments_query;
 pub mod list_comments_query;
 pub mod private_reply_request;
 pub mod private_reply_response;

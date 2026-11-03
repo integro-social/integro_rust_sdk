@@ -4,6 +4,9 @@ use crate::types::group::create_group_form::CreateGroupForm;
 use crate::types::group::create_group_response::CreateGroupResponse;
 use crate::types::group::group_query::GroupQuery;
 use crate::types::group::group_response::GroupResponse;
+use crate::types::group::legacy_group_query::LegacyGroupQuery;
+use crate::types::group::list_groups_query::ListGroupsQuery;
+use crate::types::primitives::page::Page;
 use crate::types::group::set_group_enabled_request::SetGroupEnabledRequest;
 use crate::types::group::set_group_logo_form::SetGroupLogoForm;
 use crate::types::group::set_group_logo_response::SetGroupLogoResponse;
@@ -39,10 +42,17 @@ pub async fn get(__client: &crate::runtime::Client, group_uid: &str, __query: &G
   __path = __path.replace("{group_uid}", &crate::runtime::encode_path(group_uid));
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
-/// List groups, optionally enriched with per-group counts.
+/// List groups one page at a time, optionally enriched with per-group counts.
 ///
 /// Requires `ViewGroups`; the list covers only groups where the caller holds it, and each count is filled only for those where it also holds that count's own permission — `ViewApiKeys` for `api_key_count`, `ViewMembers` for `member_count`, `ViewSocialAccounts` for `social_account_count` — `null` everywhere else.
-pub async fn list(__client: &crate::runtime::Client, __query: &GroupQuery) -> crate::runtime::ApiResult<Vec<GroupResponse>> {
+pub async fn list(__client: &crate::runtime::Client, __query: &ListGroupsQuery) -> crate::runtime::ApiResult<Page<GroupResponse>> {
+  let mut __path = String::from("/v2/group");
+  __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
+}
+/// List groups, optionally enriched with per-group counts, all at once — the pre-12.0.0 form, transitional for consumers built against 11.x; new consumers page `group.list` instead, and this route goes away in a future major.
+///
+/// Requires `ViewGroups`; the list covers only groups where the caller holds it, and each count is filled only for those where it also holds that count's own permission — `ViewApiKeys` for `api_key_count`, `ViewMembers` for `member_count`, `ViewSocialAccounts` for `social_account_count` — `null` everywhere else.
+pub async fn list_legacy(__client: &crate::runtime::Client, __query: &LegacyGroupQuery) -> crate::runtime::ApiResult<Vec<GroupResponse>> {
   let mut __path = String::from("/group");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }

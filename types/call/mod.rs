@@ -2,4 +2,5 @@
 pub mod call_client_msg;
 pub mod call_server_msg;
 pub mod conversation_calls_query;
+pub mod legacy_conversation_calls_query;
 pub mod place_call_request;

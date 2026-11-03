@@ -12,12 +12,15 @@ use crate::types::social_account::connect_social_account_response::ConnectSocial
 use crate::types::social_account::connect_social_accounts_connected::ConnectSocialAccountsConnected;
 use crate::types::social_account::connect_whatsapp_request::ConnectWhatsappRequest;
 use crate::types::social_account::connect_whatsapp_response::ConnectWhatsappResponse;
+use crate::types::social_account::count_social_accounts_query::CountSocialAccountsQuery;
 use crate::types::social_account::exposure_query::ExposureQuery;
 use crate::types::domain::exposure_report::ExposureReport;
 use crate::types::insight::insight_history_query::InsightHistoryQuery;
+use crate::types::social_account::legacy_list_social_accounts_query::LegacyListSocialAccountsQuery;
 use crate::types::social_account::list_social_accounts_query::ListSocialAccountsQuery;
 use crate::types::social_account::native_pairing_status_response::NativePairingStatusResponse;
 use crate::types::social_account::native_qr_response::NativeQrResponse;
+use crate::types::primitives::page::Page;
 use crate::types::social_account::refresh_profile_response::RefreshProfileResponse;
 use crate::types::social_account::session_status::SessionStatus;
 use crate::types::social_account::set_social_account_alias_request::SetSocialAccountAliasRequest;
@@ -26,7 +29,9 @@ use crate::types::social_account::set_social_account_enabled_request::SetSocialA
 use crate::types::social_account::set_social_account_group_request::SetSocialAccountGroupRequest;
 use crate::types::social_account::set_social_account_presence_request::SetSocialAccountPresenceRequest;
 use crate::types::social_account::social_account_response::SocialAccountResponse;
+use crate::types::social_account::social_account_summary::SocialAccountSummary;
 use crate::types::social_account::start_native_pairing_response::StartNativePairingResponse;
+use crate::types::social_account::summarize_social_accounts_query::SummarizeSocialAccountsQuery;
 
 /// Login redirect target for both flows: consumes the state, reads the grant
 /// back (Meta: exchanges the code and lists the pages; gateway: lists the
@@ -85,7 +90,7 @@ pub async fn connect_whatsapp(__client: &crate::runtime::Client, __body: &Connec
 /// Count connected social accounts, optionally filtered by groups.
 ///
 /// Requires `ViewSocialAccounts`; the count covers only accounts of groups where the caller holds it.
-pub async fn count(__client: &crate::runtime::Client, __query: &ListSocialAccountsQuery) -> crate::runtime::ApiResult<u64> {
+pub async fn count(__client: &crate::runtime::Client, __query: &CountSocialAccountsQuery) -> crate::runtime::ApiResult<u64> {
   let mut __path = String::from("/social-account/count");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
@@ -144,11 +149,18 @@ pub async fn insights_history(__client: &crate::runtime::Client, social_account_
   __path = __path.replace("{social_account_uid}", &crate::runtime::encode_path(social_account_uid));
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
-/// List connected social accounts, optionally filtered by groups, each with the
+/// List connected social accounts one page at a time, optionally filtered and searched, each with the
 /// live session status of its whatsapp session when applicable.
 ///
 /// Requires `ViewSocialAccounts`; the list covers only accounts of groups where the caller holds it.
-pub async fn list(__client: &crate::runtime::Client, __query: &ListSocialAccountsQuery) -> crate::runtime::ApiResult<Vec<SocialAccountResponse>> {
+pub async fn list(__client: &crate::runtime::Client, __query: &ListSocialAccountsQuery) -> crate::runtime::ApiResult<Page<SocialAccountResponse>> {
+  let mut __path = String::from("/v2/social-account");
+  __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
+}
+/// List connected social accounts, optionally filtered by groups, all at once, each with the live session status of its whatsapp session when applicable — the pre-12.0.0 form, transitional for consumers built against 11.x; new consumers page `socialAccount.list` instead, and this route goes away in a future major.
+///
+/// Requires `ViewSocialAccounts`; the list covers only accounts of groups where the caller holds it.
+pub async fn list_legacy(__client: &crate::runtime::Client, __query: &LegacyListSocialAccountsQuery) -> crate::runtime::ApiResult<Vec<SocialAccountResponse>> {
   let mut __path = String::from("/social-account");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
@@ -298,4 +310,12 @@ pub async fn set_presence(__client: &crate::runtime::Client, social_account_uid:
 pub async fn start_native_pairing(__client: &crate::runtime::Client, __body: &ConnectNativeRequest) -> crate::runtime::ApiResult<StartNativePairingResponse> {
   let mut __path = String::from("/social-account/native");
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
+}
+/// Summarize connected social accounts, optionally narrowed by groups and by permissions the caller holds: how many
+/// each provider has and how many need attention — session down, grant to renew, session incident, switched off.
+///
+/// Requires `ViewSocialAccounts`; the summary covers only accounts of groups where the caller holds it.
+pub async fn summary(__client: &crate::runtime::Client, __query: &SummarizeSocialAccountsQuery) -> crate::runtime::ApiResult<SocialAccountSummary> {
+  let mut __path = String::from("/social-account/summary");
+  __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }

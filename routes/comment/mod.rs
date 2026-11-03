@@ -3,7 +3,9 @@
 use crate::types::domain::comment::Comment;
 use crate::types::engagement::comment_message_request::CommentMessageRequest;
 use crate::types::engagement::create_comment_request::CreateCommentRequest;
+use crate::types::engagement::legacy_list_comments_query::LegacyListCommentsQuery;
 use crate::types::engagement::list_comments_query::ListCommentsQuery;
+use crate::types::primitives::page::Page;
 use crate::types::engagement::private_reply_request::PrivateReplyRequest;
 use crate::types::engagement::private_reply_response::PrivateReplyResponse;
 use crate::types::engagement::set_comment_hidden_request::SetCommentHiddenRequest;
@@ -49,11 +51,18 @@ pub async fn like(__client: &crate::runtime::Client, social_account_uid: &str, c
   __path = __path.replace("{comment_uid}", &crate::runtime::encode_path(comment_uid));
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, None::<&()>).await
 }
-/// Poll the unified comment feed: comments with `id` greater than `since_id`,
-/// oldest first, optionally filtered by groups, accounts, or post.
+/// Poll the unified comment feed one page at a time: comments with `id` greater than `since_id`,
+/// oldest first, optionally filtered by groups, accounts, or post; `next` sent back as `cursor` continues the same walk.
 ///
 /// Requires `ViewComments`; the feed covers only comments of groups where the caller holds it.
-pub async fn list(__client: &crate::runtime::Client, __query: &ListCommentsQuery) -> crate::runtime::ApiResult<Vec<Comment>> {
+pub async fn list(__client: &crate::runtime::Client, __query: &ListCommentsQuery) -> crate::runtime::ApiResult<Page<Comment>> {
+  let mut __path = String::from("/v2/comment");
+  __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
+}
+/// Poll the unified comment feed, comments with `id` greater than `since_id` oldest first, optionally filtered by groups, accounts or post — the pre-12.0.0 form, transitional for consumers built against 11.x; new consumers page `comment.list` instead, and this route goes away in a future major.
+///
+/// Requires `ViewComments`; the feed covers only comments of groups where the caller holds it.
+pub async fn list_legacy(__client: &crate::runtime::Client, __query: &LegacyListCommentsQuery) -> crate::runtime::ApiResult<Vec<Comment>> {
   let mut __path = String::from("/comment");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }

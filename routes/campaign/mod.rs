@@ -4,10 +4,15 @@ use crate::types::campaign::audience_request::AudienceRequest;
 use crate::types::campaign::campaign_detail::CampaignDetail;
 use crate::types::domain::campaign_recipient::CampaignRecipient;
 use crate::types::campaign::campaign_stats::CampaignStats;
+use crate::types::domain::campaign_status_counts::CampaignStatusCounts;
+use crate::types::campaign::count_campaigns_query::CountCampaignsQuery;
 use crate::types::campaign::create_campaign_request::CreateCampaignRequest;
+use crate::types::campaign::legacy_list_campaigns_query::LegacyListCampaignsQuery;
+use crate::types::campaign::legacy_list_recipients_query::LegacyListRecipientsQuery;
 use crate::types::campaign::list_campaigns_query::ListCampaignsQuery;
 use crate::types::campaign::list_recipients_query::ListRecipientsQuery;
 use crate::types::domain::message_with_context::MessageWithContext;
+use crate::types::primitives::page::Page;
 use crate::types::campaign::preflight_report::PreflightReport;
 use crate::types::campaign::remove_recipients_request::RemoveRecipientsRequest;
 use crate::types::campaign::set_accounts_request::SetAccountsRequest;
@@ -45,6 +50,13 @@ pub async fn cancel(__client: &crate::runtime::Client, campaign_uid: &str) -> cr
   __path = __path.replace("{campaign_uid}", &crate::runtime::encode_path(campaign_uid));
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, None::<&()>).await
 }
+/// How many campaigns stand in each status, optionally only some groups' — the totals a paged list cannot show.
+///
+/// Requires `ViewCampaigns`; the counts cover only campaigns of groups where the caller holds it.
+pub async fn count(__client: &crate::runtime::Client, __query: &CountCampaignsQuery) -> crate::runtime::ApiResult<CampaignStatusCounts> {
+  let mut __path = String::from("/campaign/count");
+  __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
+}
 /// Create a draft campaign in a group. Its accounts are the group's native
 /// whatsapp accounts; nothing sends until templates,
 /// accounts and an audience exist and `start` passes the preflight.
@@ -71,10 +83,17 @@ pub async fn get(__client: &crate::runtime::Client, campaign_uid: &str) -> crate
   __path = __path.replace("{campaign_uid}", &crate::runtime::encode_path(campaign_uid));
   __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
 }
-/// List campaigns, newest first, optionally only some groups'.
+/// List campaigns one page at a time, newest first unless `order` says otherwise, optionally only some groups', one status or a search.
 ///
 /// Requires `ViewCampaigns`; the list covers only campaigns of groups where the caller holds it.
-pub async fn list(__client: &crate::runtime::Client, __query: &ListCampaignsQuery) -> crate::runtime::ApiResult<Vec<CampaignDetail>> {
+pub async fn list(__client: &crate::runtime::Client, __query: &ListCampaignsQuery) -> crate::runtime::ApiResult<Page<CampaignDetail>> {
+  let mut __path = String::from("/v2/campaign");
+  __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
+}
+/// List campaigns, newest first, optionally only some groups' — the pre-12.0.0 form, transitional for consumers built against 11.x; new consumers page `campaign.list` instead, and this route goes away in a future major.
+///
+/// Requires `ViewCampaigns`; the list covers only campaigns of groups where the caller holds it.
+pub async fn list_legacy(__client: &crate::runtime::Client, __query: &LegacyListCampaignsQuery) -> crate::runtime::ApiResult<Vec<CampaignDetail>> {
   let mut __path = String::from("/campaign");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
@@ -96,10 +115,18 @@ pub async fn preflight(__client: &crate::runtime::Client, campaign_uid: &str) ->
   __path = __path.replace("{campaign_uid}", &crate::runtime::encode_path(campaign_uid));
   __client.request(crate::runtime::Method::GET, &__path, None::<&()>, None::<&()>).await
 }
-/// A page of the recipient ledger in drip order, optionally one status.
+/// The recipient ledger one page at a time, in drip order unless `order` says otherwise, optionally one status or a search.
 ///
 /// Requires `ViewCampaigns` in the campaign's group.
-pub async fn recipients(__client: &crate::runtime::Client, campaign_uid: &str, __query: &ListRecipientsQuery) -> crate::runtime::ApiResult<Vec<CampaignRecipient>> {
+pub async fn recipients(__client: &crate::runtime::Client, campaign_uid: &str, __query: &ListRecipientsQuery) -> crate::runtime::ApiResult<Page<CampaignRecipient>> {
+  let mut __path = String::from("/v2/campaign/{campaign_uid}/recipient");
+  __path = __path.replace("{campaign_uid}", &crate::runtime::encode_path(campaign_uid));
+  __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
+}
+/// A page of the recipient ledger in drip order, optionally one status, `after_id` paging forward — the pre-12.0.0 form, transitional for consumers built against 11.x; new consumers page `campaign.recipients` instead, and this route goes away in a future major.
+///
+/// Requires `ViewCampaigns` in the campaign's group.
+pub async fn recipients_legacy(__client: &crate::runtime::Client, campaign_uid: &str, __query: &LegacyListRecipientsQuery) -> crate::runtime::ApiResult<Vec<CampaignRecipient>> {
   let mut __path = String::from("/campaign/{campaign_uid}/recipient");
   __path = __path.replace("{campaign_uid}", &crate::runtime::encode_path(campaign_uid));
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await

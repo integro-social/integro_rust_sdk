@@ -7,6 +7,7 @@ use crate::types::primitives::uid::Uid;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.user"))]
 pub struct SetUserAccountNotificationRequest {
+  /// The accounts to change, at most 200 per request.
   pub social_account_uids: Vec<Uid>,
   /// New messages on these accounts ring the message sound.
   pub message_sound: Option<bool>,
