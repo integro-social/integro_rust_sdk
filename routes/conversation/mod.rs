@@ -253,8 +253,9 @@ pub async fn set_group_participant_role(__client: &crate::runtime::Client, conve
   __path = __path.replace("{participant_id}", &crate::runtime::encode_path(participant_id));
   __client.request(crate::runtime::Method::PUT, &__path, None::<&()>, Some(__body)).await
 }
-/// Set a group's picture from a hosted image; the conversation's avatar
-/// follows once the platform serves the new picture.
+/// Set a group's picture from an image, centre-cropped to a square and
+/// re-encoded as a 640×640 JPEG; the conversation's avatar follows once the
+/// platform serves the new picture.
 ///
 /// Requires `ManageWhatsappGroups` in the conversation's group; the account must still be a member (409), and the platform refuses it when the group is locked and the account is not an admin (424).
 pub async fn set_group_photo(__client: &crate::runtime::Client, conversation_uid: &str, __body: &SetGroupPhotoRequest) -> crate::runtime::ApiResult<Conversation> {
