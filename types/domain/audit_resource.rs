@@ -23,10 +23,10 @@ pub enum AuditResource {
   Media,
   Template,
   Conversation,
-  GoogleAccount,
   UserGroup,
   Call,
   GhlLocation,
   ContactImport,
   Campaign,
+  PairingLink,
 }

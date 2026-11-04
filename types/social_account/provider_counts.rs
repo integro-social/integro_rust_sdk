@@ -8,9 +8,8 @@ pub struct ProviderCounts {
   pub facebook: u64,
   pub instagram: u64,
   pub whatsapp: u64,
-  pub whatsapp_native: u64,
+  pub whatsapp_unofficial: u64,
   pub facebook_alt: u64,
   pub instagram_alt: u64,
   pub whatsapp_alt: u64,
-  pub google: u64,
 }

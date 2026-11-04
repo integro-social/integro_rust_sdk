@@ -10,6 +10,7 @@ use crate::types::message::list_messages_query::ListMessagesQuery;
 use crate::types::domain::message::Message;
 use crate::types::domain::message_with_context::MessageWithContext;
 use crate::types::primitives::page::Page;
+use crate::types::message::pin_message_request::PinMessageRequest;
 use crate::types::message::react_to_message_request::ReactToMessageRequest;
 use crate::types::message::send_message_request::SendMessageRequest;
 use crate::types::primitives::uid::Uid;
@@ -54,7 +55,7 @@ pub async fn cancel(__client: &crate::runtime::Client, conversation_uid: &str, m
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, None::<&()>).await
 }
 /// Revoke an own sent message for everyone ("apagar para todos") —
-/// whatsapp_native only; the row stays with `deleted_at` set.
+/// whatsapp_unofficial only; the row stays with `deleted_at` set.
 ///
 /// Requires `ManageMessages` in the conversation's group.
 pub async fn delete(__client: &crate::runtime::Client, conversation_uid: &str, message_uid: &str) -> crate::runtime::ApiResult<()> {
@@ -65,7 +66,7 @@ pub async fn delete(__client: &crate::runtime::Client, conversation_uid: &str, m
 }
 /// Edit an own sent message's text (or media caption) on the platform. The
 /// payload is channel-tagged and must match the message's channel — only
-/// whatsapp_native exposes an edit call, so no other channel's shape
+/// whatsapp_unofficial exposes an edit call, so no other channel's shape
 /// deserializes; the platform enforces its ~15 minute edit window.
 ///
 /// Requires `ManageMessages` in the conversation's group.
@@ -114,6 +115,20 @@ pub async fn list_legacy(__client: &crate::runtime::Client, __query: &LegacyList
   let mut __path = String::from("/message");
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
+/// Pin a message in the chat for everyone, for a day, a week or a month: the
+/// row carries `pinned_at` and `pinned_until` from then on, and the thread's
+/// pinned banner shows it. Pinning works in groups and in one-to-one chats
+/// on whatsapp_unofficial only; every other channel is refused (400). The
+/// platform refuses it in a group where only admins may post and the account
+/// is not one (424).
+///
+/// Requires `SendMessages` in the conversation's group.
+pub async fn pin(__client: &crate::runtime::Client, conversation_uid: &str, message_uid: &str, __body: &PinMessageRequest) -> crate::runtime::ApiResult<Message> {
+  let mut __path = String::from("/conversation/{conversation_uid}/message/{message_uid}/pin");
+  __path = __path.replace("{conversation_uid}", &crate::runtime::encode_path(conversation_uid));
+  __path = __path.replace("{message_uid}", &crate::runtime::encode_path(message_uid));
+  __client.request(crate::runtime::Method::PUT, &__path, None::<&()>, Some(__body)).await
+}
 /// React to a message through the platform. The payload is channel-tagged
 /// and must match the message's channel; Instagram takes Meta's reaction
 /// name, every other channel the emoji itself.
@@ -152,6 +167,16 @@ pub async fn send(__client: &crate::runtime::Client, conversation_uid: &str, __b
   let mut __path = String::from("/conversation/{conversation_uid}/message");
   __path = __path.replace("{conversation_uid}", &crate::runtime::encode_path(conversation_uid));
   __client.request(crate::runtime::Method::POST, &__path, None::<&()>, Some(__body)).await
+}
+/// Unpin a message for everyone; the row drops `pinned_at`. whatsapp_unofficial
+/// only (400 elsewhere).
+///
+/// Requires `SendMessages` in the conversation's group.
+pub async fn unpin(__client: &crate::runtime::Client, conversation_uid: &str, message_uid: &str) -> crate::runtime::ApiResult<Message> {
+  let mut __path = String::from("/conversation/{conversation_uid}/message/{message_uid}/pin");
+  __path = __path.replace("{conversation_uid}", &crate::runtime::encode_path(conversation_uid));
+  __path = __path.replace("{message_uid}", &crate::runtime::encode_path(message_uid));
+  __client.request(crate::runtime::Method::DELETE, &__path, None::<&()>, None::<&()>).await
 }
 /// Remove the account's reaction from a message (Instagram, the WhatsApp
 /// flavors and the alt channels — Messenger has no reaction API).

@@ -10,8 +10,8 @@ use crate::types::primitives::uid::Uid;
 #[serde(tag = "channel")]
 #[serde(rename_all = "snake_case")]
 pub enum LinkGhlRequest {
-  WhatsappNative {
-    /// The whatsapp_native account to bridge — same group as the location.
+  WhatsappUnofficial {
+    /// The whatsapp_unofficial account to bridge — same group as the location.
     target_account_uid: Uid,
   },
 }

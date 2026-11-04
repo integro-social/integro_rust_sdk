@@ -18,6 +18,12 @@ pub struct Message {
   pub conversation_uid: Uid,
   pub social_account_uid: Uid,
   pub participant_id: String,
+  /// In a group, the member who sent an inbound message — a phone, or a
+  /// `…@lid` the platform never resolved. `None` on direct conversations and
+  /// on outbound rows.
+  pub sender_id: Option<String>,
+  /// The sender's push name as the platform reported it with the message.
+  pub sender_name: Option<String>,
   pub direction: MessageDirection,
   pub content: MessageContent,
   pub reactions: Vec<MessageReaction>,
@@ -48,6 +54,14 @@ pub struct Message {
   pub edited_at: Option<Timestamp>,
   /// Set when the message was revoked on the platform; the row stays.
   pub deleted_at: Option<Timestamp>,
+  /// Set while the message is pinned in the chat; cleared when it is
+  /// unpinned.
+  pub pinned_at: Option<Timestamp>,
+  /// When the pin lapses on its own, as the pinner chose; the row still
+  /// reads as pinned until an unpin arrives.
+  pub pinned_until: Option<Timestamp>,
+  /// Who pinned it: a member's id, or the account's own.
+  pub pinned_by: Option<String>,
   pub sent_at: Timestamp,
   pub created_at: Timestamp,
 }

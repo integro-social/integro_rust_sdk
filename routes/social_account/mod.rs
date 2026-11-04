@@ -45,7 +45,8 @@ pub async fn callback(__client: &crate::runtime::Client, __query: &ConnectCallba
   __client.request(crate::runtime::Method::GET, &__path, Some(__query), None::<&()>).await
 }
 /// Start a login flow for a group, returning the dialog URL: the hub's own
-/// Meta app (`meta`) or the alternate gateway's for one alt channel. The
+/// Meta app (`facebook`, `instagram`) or the alternate gateway's for one alt
+/// channel. The
 /// callback stashes the granted accounts for review;
 /// `socialAccount.connectConfirm` is what registers the selection. A login
 /// naming `social_account_uid` reconnects that account in place; any other

@@ -21,7 +21,7 @@ pub enum ReactToMessageRequest {
     /// The emoji itself; omitted or empty selects ❤️.
     emoji: Option<String>,
   },
-  WhatsappNative {
+  WhatsappUnofficial {
     /// The emoji itself; omitted or empty selects ❤️.
     emoji: Option<String>,
   },

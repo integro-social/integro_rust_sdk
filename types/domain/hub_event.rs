@@ -9,7 +9,6 @@ use crate::types::domain::message::Message;
 use crate::types::domain::post::Post;
 use crate::types::domain::presence_state::PresenceState;
 use crate::types::domain::reaction_action::ReactionAction;
-use crate::types::google::review::Review;
 use crate::types::domain::social_account::SocialAccount;
 use crate::types::domain::social_post::SocialPost;
 use crate::types::primitives::timestamp::Timestamp;
@@ -256,15 +255,5 @@ pub enum HubEvent {
   AccountRemoved {
     group_uid: Uid,
     social_account_uid: Uid,
-  },
-  /// The business review sweep found a new (or edited — Google bumps the
-  /// review's update time on edits) review on one of the account's
-  /// locations.
-  ReviewReceived {
-    group_uid: Uid,
-    social_account_uid: Uid,
-    location_name: String,
-    location_title: String,
-    review: Review,
   },
 }

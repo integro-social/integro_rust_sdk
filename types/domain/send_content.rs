@@ -16,7 +16,7 @@ pub enum SendContent {
   Facebook(MessengerSend),
   Instagram(MessengerSend),
   Whatsapp(WhatsappSend),
-  WhatsappNative(NativeSend),
+  WhatsappUnofficial(NativeSend),
   /// The Messenger payload, carried by the alternate gateway.
   FacebookAlt(MessengerSend),
   /// The Instagram payload, carried by the alternate gateway.

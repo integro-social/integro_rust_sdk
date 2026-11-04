@@ -7,4 +7,6 @@ use crate::types::domain::message_content_kind::MessageContentKind;
 pub struct ConversationMessageCountQuery {
   /// Only messages of these content kinds — the same narrowing as the list.
   pub kinds: Option<Vec<MessageContentKind>>,
+  /// Only pinned messages — the same narrowing as the list.
+  pub pinned: Option<bool>,
 }

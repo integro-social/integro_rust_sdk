@@ -10,5 +10,5 @@ use crate::types::message::message_edit::MessageEdit;
 #[serde(tag = "channel")]
 #[serde(rename_all = "snake_case")]
 pub enum EditMessageRequest {
-  WhatsappNative(MessageEdit),
+  WhatsappUnofficial(MessageEdit),
 }

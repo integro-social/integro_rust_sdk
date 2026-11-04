@@ -16,6 +16,8 @@ pub struct ApiKey {
   pub created_by: Uid,
   pub revoked_at: Option<Timestamp>,
   pub revoked_by: Option<Uid>,
+  /// When the key last authenticated a request, to the flush interval; `None` until its first call.
+  pub last_used_at: Option<Timestamp>,
   pub created_at: Timestamp,
   pub updated_at: Timestamp,
 }

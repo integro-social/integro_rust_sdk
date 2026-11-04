@@ -32,5 +32,4 @@ pub enum EventKind {
   CallEnded,
   AccountUpdated,
   AccountRemoved,
-  ReviewReceived,
 }

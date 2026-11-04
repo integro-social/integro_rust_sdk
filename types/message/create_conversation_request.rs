@@ -4,7 +4,7 @@ use crate::types::primitives::phone::Phone;
 use crate::types::message::template_opener::TemplateOpener;
 use crate::types::primitives::uid::Uid;
 
-/// Channel-tagged conversation creation — whatsapp_native verifies the
+/// Channel-tagged conversation creation — whatsapp_unofficial verifies the
 /// number on the platform and opens the thread silently; whatsapp and
 /// whatsapp_alt open it by sending an approved template, the only content
 /// those channels accept before the recipient writes. No other channel's
@@ -14,8 +14,8 @@ use crate::types::primitives::uid::Uid;
 #[serde(tag = "channel")]
 #[serde(rename_all = "snake_case")]
 pub enum CreateConversationRequest {
-  WhatsappNative {
-    /// A whatsapp_native social account.
+  WhatsappUnofficial {
+    /// A whatsapp_unofficial social account.
     social_account_uid: Uid,
     /// The recipient's phone in E.164 (`+<country code><number>`).
     phone: Phone,

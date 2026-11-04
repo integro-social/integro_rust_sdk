@@ -3,9 +3,8 @@
 
 /// Every kind of account the hub connects — the account registry's axis.
 /// Distinct from [`Channel`], which is the *messaging-domain* discriminator
-/// carried by conversations, messages, and posts: every messaging provider
-/// projects onto a channel, while non-messaging providers (calendar) have
-/// none — so messaging payloads can never name them.
+/// carried by conversations, messages, and posts: every provider projects
+/// onto the channel its traffic is tagged with.
 ///
 /// Adding an integration = a variant here + its connect flow + its
 /// capability module; the registry (table, CRUD, listing UI) is shared.
@@ -18,15 +17,11 @@ pub enum Provider {
   /// WhatsApp Business Platform (official Meta Cloud API).
   Whatsapp,
   /// WhatsApp via an in-process whatsmeow linked-device session (unofficial).
-  WhatsappNative,
+  WhatsappUnofficial,
   /// Facebook through the alternate gateway; see [`Channel::FacebookAlt`].
   FacebookAlt,
   /// Instagram through the alternate gateway; see [`Channel::InstagramAlt`].
   InstagramAlt,
   /// WhatsApp through the alternate gateway; see [`Channel::WhatsappAlt`].
   WhatsappAlt,
-  /// A Google account (per-account OAuth). Which surfaces it reaches —
-  /// calendar today, business profile ahead — is decided by the scopes the
-  /// grant carries, not by the provider.
-  Google,
 }

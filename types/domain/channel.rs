@@ -17,7 +17,7 @@ pub enum Channel {
   /// WhatsApp via an in-process whatsmeow linked-device session (unofficial,
   /// pairs a regular WhatsApp account). Same conversation/message surface as
   /// [`Channel::Whatsapp`]; no 24h window, no templates.
-  WhatsappNative,
+  WhatsappUnofficial,
   /// Facebook through the hub's alternate gateway, used while the hub's own
   /// Meta app awaits review. Same rules as [`Channel::Facebook`]; an account
   /// connected here and one connected officially are two accounts, each with

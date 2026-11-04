@@ -16,6 +16,8 @@ pub struct ConversationMessagesQuery {
   /// `image, video, gif, sticker, audio, file` without loading the text
   /// between them; absent or empty means every kind.
   pub kinds: Option<Vec<MessageContentKind>>,
+  /// Only messages pinned in the chat — what a thread's pinned banner shows.
+  pub pinned: Option<bool>,
   /// The previous page's `next`, sent back with the same anchors and `kinds`; it continues older without `after_id`, newer with it.
   /// Omit for the first page.
   pub cursor: Option<Cursor>,

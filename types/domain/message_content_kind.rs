@@ -27,4 +27,5 @@ pub enum MessageContentKind {
   Postback,
   Unavailable,
   Unsupported,
+  GroupNotice,
 }

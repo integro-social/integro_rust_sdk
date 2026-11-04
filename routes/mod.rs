@@ -3,8 +3,6 @@
 
 pub mod api_key;
 pub mod audit_log;
-pub mod business;
-pub mod calendar;
 pub mod call;
 pub mod campaign;
 pub mod campaign_template;
@@ -16,7 +14,6 @@ pub mod event;
 pub mod event_webhook;
 pub mod ghl;
 pub mod gif;
-pub mod google;
 pub mod group;
 pub mod group_member;
 pub mod insight;
@@ -25,6 +22,7 @@ pub mod mail_queue;
 pub mod media;
 pub mod message;
 pub mod oauth;
+pub mod pairing_link;
 pub mod post;
 pub mod pulse;
 pub mod rate_limit;
