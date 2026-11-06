@@ -7,7 +7,7 @@ use crate::types::event::server_msg::ServerMsg;
 /// `hello` (optional `(epoch, seq)` resume cursor + roster filter) and may
 /// replace the roster or the focused-conversation set at any time; the
 /// server pushes sequenced `event` frames — the same `HubEvent` payloads the
-/// group webhook delivers — plus `gap` when events were missed and cannot be
+/// group webhooks deliver — plus `gap` when events were missed and cannot be
 /// replayed (re-hydrate from REST; storage is the source of truth). Auth is
 /// re-validated continuously, so key revocation, permission edits, and
 /// session expiry close the connection mid-stream.

@@ -4,6 +4,9 @@ use crate::types::primitives::uid::Uid;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.event"))]
-pub struct GetWebhookQuery {
-  pub group_uid: Option<Uid>,
+pub struct CountWebhooksQuery {
+  /// Narrow to these groups, each one the caller may see; omit for everything the caller may see.
+  pub group_uids: Option<Vec<Uid>>,
+  /// Only active (`true`) or only paused (`false`) webhooks.
+  pub enabled: Option<bool>,
 }

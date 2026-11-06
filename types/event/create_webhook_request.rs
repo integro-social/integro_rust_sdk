@@ -2,13 +2,17 @@
 #![allow(unused_imports, non_snake_case, non_camel_case_types, clippy::all)]
 use crate::types::domain::channel::Channel;
 use crate::types::domain::event_kind::EventKind;
+use crate::types::primitives::name::Name;
 use crate::types::primitives::uid::Uid;
+use crate::types::domain::webhook_header::WebhookHeader;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.event"))]
-pub struct SetWebhookRequest {
+pub struct CreateWebhookRequest {
   /// Required for users and platform keys; group-bound keys imply their group.
   pub group_uid: Option<Uid>,
+  pub name: Name,
+  /// Where the batches are POSTed; must reach a public internet address.
   pub url: String,
   /// Event kinds delivered to this subscription; omit for everything. The
   /// live-only kinds (the presence kinds), which reach only the event socket,
@@ -16,4 +20,10 @@ pub struct SetWebhookRequest {
   pub events: Option<Vec<EventKind>>,
   /// Channels delivered to this subscription; omit for everything.
   pub channels: Option<Vec<Channel>>,
+  /// Accounts delivered to this subscription (≤200), all of the webhook's
+  /// group; omit for every account of the group, including accounts connected
+  /// later.
+  pub social_account_uids: Option<Vec<Uid>>,
+  /// Extra headers sent with every delivery (≤10); omit for none.
+  pub headers: Option<Vec<WebhookHeader>>,
 }

@@ -4,9 +4,9 @@ use crate::types::primitives::uid::Uid;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.event"))]
-pub struct SetWebhookResponse {
+pub struct CreateWebhookResponse {
   pub uid: Uid,
-  /// HMAC secret for `X-Integro-Signature` — shown only here; rotated on every
-  /// reconfiguration.
+  /// HMAC secret for `X-Integro-Signature` — shown only here and when the
+  /// secret is rotated.
   pub secret: String,
 }

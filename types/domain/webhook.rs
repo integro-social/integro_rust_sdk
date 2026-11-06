@@ -2,19 +2,40 @@
 #![allow(unused_imports, non_snake_case, non_camel_case_types, clippy::all)]
 use crate::types::domain::channel::Channel;
 use crate::types::domain::event_kind::EventKind;
+use crate::types::primitives::name::Name;
 use crate::types::primitives::timestamp::Timestamp;
 use crate::types::primitives::uid::Uid;
+use crate::types::domain::webhook_failure::WebhookFailure;
+use crate::types::domain::webhook_header::WebhookHeader;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "tapir", derive(tapir::Reflect), tapir(namespace = "integro_sdk.domain"))]
 pub struct Webhook {
   pub uid: Uid,
   pub group_uid: Uid,
+  pub name: Name,
   pub url: String,
+  /// A paused webhook receives nothing, and the events of the paused window are never delivered.
+  pub enabled: bool,
   /// Event kinds delivered to this subscription; `None` = everything.
   pub events: Option<Vec<EventKind>>,
   /// Channels delivered to this subscription; `None` = everything.
   pub channels: Option<Vec<Channel>>,
+  /// Accounts delivered to this subscription, all of the webhook's group; `None` = every account of the group, including
+  /// accounts connected later. An account deleted or moved to another group stops matching.
+  pub social_account_uids: Option<Vec<Uid>>,
+  /// Extra headers sent with every delivery.
+  pub headers: Vec<WebhookHeader>,
+  /// The accountable user who created it — for an API key, the key's creator; `None` for a webhook created before 14.0.0 or
+  /// whose creator was deleted.
+  pub created_by: Option<Uid>,
+  /// When a delivery (a batch or a heartbeat) was last accepted with a 2xx, to within about ten seconds; `None` until the first.
+  pub last_delivered_at: Option<Timestamp>,
+  /// When a delivery last failed, to within about ten seconds; `None` until the first. The webhook is failing while this is
+  /// later than `last_delivered_at`.
+  pub last_failed_at: Option<Timestamp>,
+  /// Why the delivery at `last_failed_at` failed.
+  pub last_failure: Option<WebhookFailure>,
   pub created_at: Timestamp,
   pub updated_at: Timestamp,
 }
