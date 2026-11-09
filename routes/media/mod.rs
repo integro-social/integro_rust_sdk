@@ -20,7 +20,9 @@ pub async fn create_upload_url(__client: &crate::runtime::Client, __body: &Creat
 }
 /// Serve a hub-hosted media file. The uid may carry a cosmetic extension
 /// suffix (`{uid}.m4a`), stripped before lookup. A uid nothing names any more
-/// answers 404: the file went with its last referrer.
+/// answers 404: the file went with its last referrer. The reply carries the
+/// file's length and honors a single byte `Range` (206 with `Content-Range`;
+/// a range past the end answers 416), so a player can seek.
 ///
 /// A session cookie, a bearer session token or an API key: served when the caller may see something that names the file — `ViewMessages` in the group for a message attachment or a conversation avatar, `ViewPosts` for a post, `ViewCampaigns` for a template, `ViewSocialAccounts` for an account avatar, `ViewGroups` for a group logo, platform `ViewIssues` for a screenshot, or the reporter's own user for a screenshot on an issue they reported — or when the caller uploaded it from a session within the last 24 hours and nothing names it yet. A signed grant (`exp`, `sig`) minted by the hub for a platform fetch serves without a credential until it expires. Anything else answers 404, indistinguishable from an unknown uid.
 pub async fn serve(__client: &crate::runtime::Client, media_uid: &str, __query: &MediaGrantQuery) -> crate::runtime::ApiResult<Vec<u8>> {
