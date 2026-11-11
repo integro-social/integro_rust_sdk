@@ -110,6 +110,12 @@ pub async fn clear(__client: &crate::runtime::Client, conversation_uid: &str) ->
 /// verifies the number ahead of the send. facebook, instagram and their alt
 /// twins cannot open conversations, so their shapes do not deserialize.
 ///
+/// A brazilian mobile number with or without its ninth digit names the same
+/// conversation. On whatsapp_unofficial the account's `cold_contact` policy
+/// decides a number it never heard from: `block` refuses it (409), `hold`
+/// opens the conversation unchecked and unprofiled, and neither ever profiles
+/// a conversation whose contact has not written yet.
+///
 /// Requires `SendMessages` in the account's group.
 pub async fn create(__client: &crate::runtime::Client, __body: &CreateConversationRequest) -> crate::runtime::ApiResult<Conversation> {
   let mut __path = String::from("/conversation");

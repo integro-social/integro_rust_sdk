@@ -24,6 +24,7 @@ use crate::types::primitives::page::Page;
 use crate::types::social_account::refresh_profile_response::RefreshProfileResponse;
 use crate::types::social_account::session_status::SessionStatus;
 use crate::types::social_account::set_social_account_alias_request::SetSocialAccountAliasRequest;
+use crate::types::social_account::set_social_account_cold_contact_request::SetSocialAccountColdContactRequest;
 use crate::types::social_account::set_social_account_conversation_cap_request::SetSocialAccountConversationCapRequest;
 use crate::types::social_account::set_social_account_enabled_request::SetSocialAccountEnabledRequest;
 use crate::types::social_account::set_social_account_group_request::SetSocialAccountGroupRequest;
@@ -247,6 +248,22 @@ pub async fn refresh_profile(__client: &crate::runtime::Client, social_account_u
 /// Requires `UpdateSocialAccounts` in the account's group.
 pub async fn set_alias(__client: &crate::runtime::Client, social_account_uid: &str, __body: &SetSocialAccountAliasRequest) -> crate::runtime::ApiResult<()> {
   let mut __path = String::from("/social-account/{social_account_uid}/alias");
+  __path = __path.replace("{social_account_uid}", &crate::runtime::encode_path(social_account_uid));
+  __client.request(crate::runtime::Method::PUT, &__path, None::<&()>, Some(__body)).await
+}
+/// Set how the account treats a contact who never wrote to it: `allow` sends
+/// and looks up as usual; `block` refuses sends to such a contact and never
+/// checks, profiles or watches one; `hold` does the same lookups-wise but keeps
+/// the sends as `held` (at most `limit` per contact, the oldest canceled to make
+/// room) until the contact's first message, then sends them in order. A change
+/// reaches what has not gone out yet: `allow` queues every held send at once,
+/// `block` cancels held sends and queued sends to such contacts, and `hold`
+/// holds those queued sends and trims each contact to the new limit. Only the
+/// session-backed whatsapp channels enforce it; other channels are refused.
+///
+/// Requires `UpdateSocialAccounts` in the account's group.
+pub async fn set_cold_contact(__client: &crate::runtime::Client, social_account_uid: &str, __body: &SetSocialAccountColdContactRequest) -> crate::runtime::ApiResult<()> {
+  let mut __path = String::from("/social-account/{social_account_uid}/cold-contact");
   __path = __path.replace("{social_account_uid}", &crate::runtime::encode_path(social_account_uid));
   __client.request(crate::runtime::Method::PUT, &__path, None::<&()>, Some(__body)).await
 }

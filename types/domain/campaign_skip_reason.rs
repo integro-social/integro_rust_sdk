@@ -16,4 +16,7 @@ pub enum CampaignSkipReason {
   MissingVariable,
   /// The campaign's end date passed with the recipient still queued.
   CampaignEnded,
+  /// The number never wrote to the sending account, whose `cold_contact`
+  /// policy is `block`.
+  ColdContact,
 }

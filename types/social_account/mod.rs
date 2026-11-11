@@ -29,6 +29,7 @@ pub mod refresh_profile_response;
 pub mod removed_access;
 pub mod session_status;
 pub mod set_social_account_alias_request;
+pub mod set_social_account_cold_contact_request;
 pub mod set_social_account_conversation_cap_request;
 pub mod set_social_account_enabled_request;
 pub mod set_social_account_group_request;

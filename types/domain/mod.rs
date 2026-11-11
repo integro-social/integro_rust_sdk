@@ -24,6 +24,7 @@ pub mod campaign_status;
 pub mod campaign_status_counts;
 pub mod channel;
 pub mod channel_family;
+pub mod cold_contact_policy;
 pub mod comment;
 pub mod contact_card;
 pub mod contact_import;

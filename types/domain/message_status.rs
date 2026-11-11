@@ -12,6 +12,12 @@ pub enum MessageStatus {
   /// resolves to `Sent`/`Failed` when the queue drains, or `Canceled` if
   /// canceled first.
   Pending,
+  /// Outbound message to a cold contact under the account's `hold` policy,
+  /// sent while it held or still queued when the account switched to it: kept
+  /// off the platform until the contact's first message, then queued as
+  /// `Pending` in order. Released the same way when the account switches to
+  /// `allow`.
+  Held,
   /// Outbound message accepted by the platform.
   Sent,
   /// Outbound message delivered to the recipient (delivery receipt).
@@ -20,8 +26,10 @@ pub enum MessageStatus {
   Read,
   /// Outbound message the platform rejected.
   Failed,
-  /// A `Pending` message canceled before it was sent — directly, or by
-  /// cascade when an earlier pending message in the same conversation was
-  /// canceled. Terminal: the platform never saw it.
+  /// A `Pending` or `Held` message canceled before it was sent — directly, by
+  /// cascade when an earlier queued message in the same conversation was
+  /// canceled, a held one pushed past the account's hold limit, or one bound
+  /// for a cold contact when the account switches to `block`. Terminal: the
+  /// platform never saw it.
   Canceled,
 }

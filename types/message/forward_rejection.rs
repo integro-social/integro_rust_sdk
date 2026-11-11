@@ -21,6 +21,9 @@ pub enum ForwardRejection {
   /// that only what the window lifts by passes — a template on official and
   /// alt whatsapp. The native flavor has no window.
   WindowExpired,
+  /// The target's contact never wrote to its account, and the account's
+  /// `cold_contact` policy is `block`.
+  ColdContact,
   /// The send could not be queued.
   Failed,
 }
